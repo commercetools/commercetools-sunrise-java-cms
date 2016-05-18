@@ -10,9 +10,8 @@ organization := "io.commercetools.sunrise"
  */
 
 lazy val `commercetools-sunrise-cms` = (project in file("."))
-  .configs(IntegrationTest)
   .aggregate(`cms-common`, `cms-contentful`)
-  .settings(javaUnidocSettings ++ commonSettings ++ commonTestSettings : _*)
+  .settings(javaUnidocSettings ++ commonSettings : _*)
 
 lazy val `cms-common` = project
   .configs(IntegrationTest)
