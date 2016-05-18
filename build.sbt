@@ -5,15 +5,47 @@ name := "commercetools-sunrise-cms"
 
 organization := "io.commercetools.sunrise"
 
+/**
+ * PROJECT DEFINITIONS
+ */
+
 lazy val `commercetools-sunrise-cms` = (project in file("."))
   .configs(IntegrationTest)
+  .aggregate(`cms-common`, `cms-contentful`)
   .settings(javaUnidocSettings ++ commonSettings ++ commonTestSettings : _*)
+
+lazy val `cms-common` = project
+  .configs(IntegrationTest)
+  .settings(commonSettings ++ commonTestSettings : _*)
+  .settings(
+    libraryDependencies ++= Seq(
+      "org.apache.commons" % "commons-lang3" % "3.0",
+      "javax.inject" % "javax.inject" % "1",
+      "com.google.code.findbugs" % "jsr305" % "3.0.0"
+    )
+  )
+
+//lazy val `cms-file-based` = project
+//  .configs(IntegrationTest)
+//  .settings(commonSettings ++ commonTestSettings : _*)
+//  .dependsOn(`cms-common`)
+
+lazy val `cms-contentful` = project
+  .configs(IntegrationTest)
+  .settings(commonSettings ++ commonTestSettings : _*)
+  .dependsOn(`cms-common`)
+
+
+/**
+ * COMMON SETTINGS
+ */
 
 lazy val commonSettings = releaseSettings ++ Seq (
   scalaVersion := "2.11.8",
   javacOptions in (Compile, doc) := Seq("-quiet", "-notimestamp"),
   javacOptions ++= Seq("-source", "1.8", "-target", "1.8")
 )
+
 
 /**
  * TEST SETTINGS
@@ -33,8 +65,7 @@ def configCommonTestSettings(scopes: String) = Seq(
   testOptions += Tests.Argument(TestFrameworks.JUnit, "-v"),
   libraryDependencies ++= Seq (
     "com.novocode" % "junit-interface" % "0.11" % scopes,
-    "org.assertj" % "assertj-core" % "3.4.1" % scopes,
-    "com.icegreen" % "greenmail" % "1.5.0" % scopes
+    "org.assertj" % "assertj-core" % "3.4.1" % scopes
   )
 )
 
