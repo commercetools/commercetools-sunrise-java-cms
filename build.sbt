@@ -18,7 +18,7 @@ lazy val `cms-common` = project
   .settings(commonSettings ++ commonTestSettings : _*)
   .settings(
     libraryDependencies ++= Seq(
-      "org.apache.commons" % "commons-lang3" % "3.0",
+      "org.apache.commons" % "commons-lang3" % "3.4",
       "com.google.code.findbugs" % "jsr305" % "3.0.0"
     )
   )
