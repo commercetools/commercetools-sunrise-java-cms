@@ -19,7 +19,6 @@ lazy val `cms-common` = project
   .settings(
     libraryDependencies ++= Seq(
       "org.apache.commons" % "commons-lang3" % "3.0",
-      "javax.inject" % "javax.inject" % "1",
       "com.google.code.findbugs" % "jsr305" % "3.0.0"
     )
   )
