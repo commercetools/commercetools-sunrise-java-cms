@@ -30,7 +30,13 @@ lazy val `cms-common` = project
 
 lazy val `cms-contentful` = project
   .configs(IntegrationTest)
-  .settings(commonSettings ++ commonTestSettings : _*)
+  .settings(commonSettings ++ commonTestSettings: _*)
+  .settings(
+    libraryDependencies ++= Seq(
+      "com.squareup.okhttp3" % "okhttp" % "3.2.0",
+      "com.contentful.java" % "java-sdk" % "7.0.1"
+    )
+  )
   .dependsOn(`cms-common`)
 
 
@@ -63,7 +69,8 @@ def configCommonTestSettings(scopes: String) = Seq(
   testOptions += Tests.Argument(TestFrameworks.JUnit, "-v"),
   libraryDependencies ++= Seq (
     "com.novocode" % "junit-interface" % "0.11" % scopes,
-    "org.assertj" % "assertj-core" % "3.4.1" % scopes
+    "org.assertj" % "assertj-core" % "3.4.1" % scopes,
+    "org.mockito" % "mockito-all" % "1.10.19" % scopes
   )
 )
 
