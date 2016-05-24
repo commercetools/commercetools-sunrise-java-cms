@@ -14,10 +14,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
+import java.util.function.Predicate;
 
 public class ContentfulCmsService implements CmsService {
 
-    static final String ENTRY_KEY = "name";
     private Map<String, CDAEntry> entries;
 
     ContentfulCmsService(Map<String, CDAEntry> entries) {
@@ -35,9 +35,17 @@ public class ContentfulCmsService implements CmsService {
     private Optional<CDAEntry> getEntry(CmsIdentifier cmsIdentifier) {
         return entries.values()
                 .stream()
-                .filter(entry -> entry.contentType().id().equals(cmsIdentifier.getEntryType())
-                        && entry.getField(ENTRY_KEY).toString().equals(cmsIdentifier.getEntryKey()))
+                .filter(entryPredicate(cmsIdentifier))
                 .findFirst();
+    }
+
+    private Predicate<CDAEntry> entryPredicate(CmsIdentifier cmsIdentifier) {
+        return entry -> {
+            final String contentfulEntryType = entry.contentType().id();
+            final String contentfulEntryKey = entry.getField(entry.contentType().displayField());
+            return contentfulEntryType.equals(cmsIdentifier.getEntryType())
+                    && contentfulEntryKey.equals(cmsIdentifier.getEntryKey());
+        };
     }
 
     private Optional<String> getLocalizedField(List<Locale> locales, CDAEntry cdaEntry, String fieldName) {

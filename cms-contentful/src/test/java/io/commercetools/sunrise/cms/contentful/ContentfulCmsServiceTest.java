@@ -97,15 +97,17 @@ public class ContentfulCmsServiceTest {
     }
 
     private CDAEntry mockEntry(String entryType, String entryKey, String fieldName, String localizedFieldContent) {
+        final String entryTitle = "name";
         CDAEntry mockCdaEntry = mock(CDAEntry.class);
 
         // mock entry type
         CDAContentType mockContentType = mock(CDAContentType.class);
         when(mockContentType.id()).thenReturn(entryType);
+        when(mockContentType.displayField()).thenReturn(entryTitle);
         when(mockCdaEntry.contentType()).thenReturn(mockContentType);
 
         // mock entry key
-        when(mockCdaEntry.getField(ContentfulCmsService.ENTRY_KEY)).thenReturn(entryKey);
+        when(mockCdaEntry.getField(entryTitle)).thenReturn(entryKey);
 
         // mock field content
         Map<String, String> mockFields = new HashMap<>();
