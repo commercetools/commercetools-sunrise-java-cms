@@ -17,7 +17,7 @@ import java.util.concurrent.CompletionStage;
 
 public class ContentfulCmsService implements CmsService {
 
-    private static final String ENTRY_KEY = "name";
+    static final String ENTRY_KEY = "name";
     private Map<String, CDAEntry> entries;
 
     ContentfulCmsService(Map<String, CDAEntry> entries) {
