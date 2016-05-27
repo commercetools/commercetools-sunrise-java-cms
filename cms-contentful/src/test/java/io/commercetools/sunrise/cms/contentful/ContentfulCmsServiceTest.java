@@ -45,7 +45,7 @@ public class ContentfulCmsServiceTest {
         CompletionStage<Optional<String>> optionalCompletionStage = contentfulCmsService.get(SUPPORTED_LOCALES, identifier);
         Optional<String> content = waitAndGet(optionalCompletionStage);
 
-        assertThat(content.isPresent()).isTrue();
+        assertThat(content).isPresent();
         assertThat(content.get()).isEqualTo(CONTENT_VALUE);
     }
 
@@ -58,7 +58,7 @@ public class ContentfulCmsServiceTest {
         CompletionStage<Optional<String>> optionalCompletionStage = contentfulCmsService.get(supportedLocales, identifier);
         Optional<String> content = waitAndGet(optionalCompletionStage);
 
-        assertThat(content.isPresent()).isFalse();
+        assertThat(content).isEmpty();
     }
 
     @Test
@@ -69,7 +69,7 @@ public class ContentfulCmsServiceTest {
         CompletionStage<Optional<String>> optionalCompletionStage = contentfulCmsService.get(SUPPORTED_LOCALES, identifier);
         Optional<String> content = waitAndGet(optionalCompletionStage);
 
-        assertThat(content.isPresent()).isFalse();
+        assertThat(content).isEmpty();
     }
 
     @Test
@@ -80,7 +80,7 @@ public class ContentfulCmsServiceTest {
         CompletionStage<Optional<String>> optionalCompletionStage = contentfulCmsService.get(SUPPORTED_LOCALES, identifier);
         Optional<String> content = waitAndGet(optionalCompletionStage);
 
-        assertThat(content.isPresent()).isFalse();
+        assertThat(content).isEmpty();
     }
 
     @Test
@@ -91,7 +91,7 @@ public class ContentfulCmsServiceTest {
         CompletionStage<Optional<String>> optionalCompletionStage = contentfulCmsService.get(SUPPORTED_LOCALES, identifier);
         Optional<String> content = waitAndGet(optionalCompletionStage);
 
-        assertThat(content.isPresent()).isFalse();
+        assertThat(content).isEmpty();
     }
 
     private CDAEntry mockEntry(String entryType, String entryKey, String fieldName, String localizedFieldContent) {

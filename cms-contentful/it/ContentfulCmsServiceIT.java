@@ -31,7 +31,7 @@ public class ContentfulCmsServiceIT {
         CompletionStage<Optional<String>> optionalCompletionStage = contentfulCmsService.get(SUPPORTED_LOCALES, identifier);
         Optional<String> content = waitAndGet(optionalCompletionStage);
 
-        assertThat(content.isPresent()).isTrue();
+        assertThat(content).isPresent();
         assertThat(content.get()).isEqualTo("Fearless adventurer! Defender of pancakes.");
     }
 
@@ -41,7 +41,7 @@ public class ContentfulCmsServiceIT {
         CompletionStage<Optional<String>> optionalCompletionStage = contentfulCmsService.get(SUPPORTED_LOCALES, identifier);
         Optional<String> content = waitAndGet(optionalCompletionStage);
 
-        assertThat(content.isPresent()).isFalse();
+        assertThat(content).isEmpty();
     }
 
     @Test
@@ -50,7 +50,7 @@ public class ContentfulCmsServiceIT {
         CompletionStage<Optional<String>> optionalCompletionStage = contentfulCmsService.get(SUPPORTED_LOCALES, identifier);
         Optional<String> content = waitAndGet(optionalCompletionStage);
 
-        assertThat(content.isPresent()).isTrue();
+        assertThat(content).isPresent();
         assertThat(content.get()).isEqualTo("//images.contentful.com/cfexampleapi/4hlteQAXS8iS0YCMU6QMWg/2a4d826144f014109364ccf5c891d2dd/jake.png");
     }
 
@@ -60,7 +60,7 @@ public class ContentfulCmsServiceIT {
         CompletionStage<Optional<String>> optionalCompletionStage = contentfulCmsService.get(SUPPORTED_LOCALES, identifier);
         Optional<String> content = waitAndGet(optionalCompletionStage);
 
-        assertThat(content.isPresent()).isFalse();
+        assertThat(content).isEmpty();
     }
 
 }
