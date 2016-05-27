@@ -13,8 +13,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletionStage;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
-import static utils.TestHelper.waitAndGet;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -42,8 +44,7 @@ public class ContentfulCmsServiceTest {
     public void whenSearchedContentExists_thenReturnIt() throws Exception {
         CmsIdentifier identifier = CmsIdentifier.ofEntryTypeAndKeyAndField(ENTRY_TYPE, ENTRY_KEY, FIELD_NAME);
 
-        CompletionStage<Optional<String>> optionalCompletionStage = contentfulCmsService.get(SUPPORTED_LOCALES, identifier);
-        Optional<String> content = waitAndGet(optionalCompletionStage);
+        Optional<String> content = waitAndGet(contentfulCmsService.get(SUPPORTED_LOCALES, identifier));
 
         assertThat(content).isPresent();
         assertThat(content.get()).isEqualTo(CONTENT_VALUE);
@@ -55,8 +56,7 @@ public class ContentfulCmsServiceTest {
         List<Locale> supportedLocales = Collections.singletonList(deAt);
         CmsIdentifier identifier = CmsIdentifier.ofEntryTypeAndKeyAndField(ENTRY_TYPE, ENTRY_KEY, FIELD_NAME);
 
-        CompletionStage<Optional<String>> optionalCompletionStage = contentfulCmsService.get(supportedLocales, identifier);
-        Optional<String> content = waitAndGet(optionalCompletionStage);
+        Optional<String> content = waitAndGet(contentfulCmsService.get(supportedLocales, identifier));
 
         assertThat(content).isEmpty();
     }
@@ -66,8 +66,7 @@ public class ContentfulCmsServiceTest {
         final String notMatchingFieldName = "notMatchingFieldName";
         CmsIdentifier identifier = CmsIdentifier.ofEntryTypeAndKeyAndField(ENTRY_TYPE, ENTRY_KEY, notMatchingFieldName);
 
-        CompletionStage<Optional<String>> optionalCompletionStage = contentfulCmsService.get(SUPPORTED_LOCALES, identifier);
-        Optional<String> content = waitAndGet(optionalCompletionStage);
+        Optional<String> content = waitAndGet(contentfulCmsService.get(SUPPORTED_LOCALES, identifier));
 
         assertThat(content).isEmpty();
     }
@@ -77,8 +76,7 @@ public class ContentfulCmsServiceTest {
         final String notMatchingEntryKey = "notMatchingEntryKey";
         CmsIdentifier identifier = CmsIdentifier.ofEntryTypeAndKeyAndField(ENTRY_TYPE, notMatchingEntryKey, FIELD_NAME);
 
-        CompletionStage<Optional<String>> optionalCompletionStage = contentfulCmsService.get(SUPPORTED_LOCALES, identifier);
-        Optional<String> content = waitAndGet(optionalCompletionStage);
+        Optional<String> content = waitAndGet(contentfulCmsService.get(SUPPORTED_LOCALES, identifier));
 
         assertThat(content).isEmpty();
     }
@@ -88,10 +86,13 @@ public class ContentfulCmsServiceTest {
         final String notMatchingEntryType = "notMatchingEntryType";
         CmsIdentifier identifier = CmsIdentifier.ofEntryTypeAndKeyAndField(notMatchingEntryType, ENTRY_KEY, FIELD_NAME);
 
-        CompletionStage<Optional<String>> optionalCompletionStage = contentfulCmsService.get(SUPPORTED_LOCALES, identifier);
-        Optional<String> content = waitAndGet(optionalCompletionStage);
+        Optional<String> content = waitAndGet(contentfulCmsService.get(SUPPORTED_LOCALES, identifier));
 
         assertThat(content).isEmpty();
+    }
+
+    private <T> T waitAndGet(final CompletionStage<T> stage) throws InterruptedException, ExecutionException, TimeoutException {
+        return stage.toCompletableFuture().get(5, TimeUnit.SECONDS);
     }
 
     private CDAEntry mockEntry(String entryType, String entryKey, String fieldName, String localizedFieldContent) {
