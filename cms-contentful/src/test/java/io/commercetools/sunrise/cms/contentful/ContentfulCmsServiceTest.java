@@ -13,8 +13,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletionStage;
-import java.util.concurrent.TimeUnit;
 
+import static utils.TestHelper.waitAndGet;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -43,7 +43,7 @@ public class ContentfulCmsServiceTest {
         CmsIdentifier identifier = CmsIdentifier.ofEntryTypeAndKeyAndField(ENTRY_TYPE, ENTRY_KEY, FIELD_NAME);
 
         CompletionStage<Optional<String>> optionalCompletionStage = contentfulCmsService.get(SUPPORTED_LOCALES, identifier);
-        Optional<String> content = optionalCompletionStage.toCompletableFuture().get(5, TimeUnit.SECONDS);
+        Optional<String> content = waitAndGet(optionalCompletionStage);
 
         assertThat(content.isPresent()).isTrue();
         assertThat(content.get()).isEqualTo(CONTENT_VALUE);
@@ -56,7 +56,7 @@ public class ContentfulCmsServiceTest {
         CmsIdentifier identifier = CmsIdentifier.ofEntryTypeAndKeyAndField(ENTRY_TYPE, ENTRY_KEY, FIELD_NAME);
 
         CompletionStage<Optional<String>> optionalCompletionStage = contentfulCmsService.get(supportedLocales, identifier);
-        Optional<String> content = optionalCompletionStage.toCompletableFuture().get(5, TimeUnit.SECONDS);
+        Optional<String> content = waitAndGet(optionalCompletionStage);
 
         assertThat(content.isPresent()).isFalse();
     }
@@ -67,7 +67,7 @@ public class ContentfulCmsServiceTest {
         CmsIdentifier identifier = CmsIdentifier.ofEntryTypeAndKeyAndField(ENTRY_TYPE, ENTRY_KEY, notMatchingFieldName);
 
         CompletionStage<Optional<String>> optionalCompletionStage = contentfulCmsService.get(SUPPORTED_LOCALES, identifier);
-        Optional<String> content = optionalCompletionStage.toCompletableFuture().get(5, TimeUnit.SECONDS);
+        Optional<String> content = waitAndGet(optionalCompletionStage);
 
         assertThat(content.isPresent()).isFalse();
     }
@@ -78,7 +78,7 @@ public class ContentfulCmsServiceTest {
         CmsIdentifier identifier = CmsIdentifier.ofEntryTypeAndKeyAndField(ENTRY_TYPE, notMatchingEntryKey, FIELD_NAME);
 
         CompletionStage<Optional<String>> optionalCompletionStage = contentfulCmsService.get(SUPPORTED_LOCALES, identifier);
-        Optional<String> content = optionalCompletionStage.toCompletableFuture().get(5, TimeUnit.SECONDS);
+        Optional<String> content = waitAndGet(optionalCompletionStage);
 
         assertThat(content.isPresent()).isFalse();
     }
@@ -89,7 +89,7 @@ public class ContentfulCmsServiceTest {
         CmsIdentifier identifier = CmsIdentifier.ofEntryTypeAndKeyAndField(notMatchingEntryType, ENTRY_KEY, FIELD_NAME);
 
         CompletionStage<Optional<String>> optionalCompletionStage = contentfulCmsService.get(SUPPORTED_LOCALES, identifier);
-        Optional<String> content = optionalCompletionStage.toCompletableFuture().get(5, TimeUnit.SECONDS);
+        Optional<String> content = waitAndGet(optionalCompletionStage);
 
         assertThat(content.isPresent()).isFalse();
     }
