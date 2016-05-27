@@ -30,9 +30,10 @@ lazy val `cms-common` = project
 
 lazy val `cms-contentful` = project
   .configs(IntegrationTest)
-  .settings(commonSettings ++ commonTestSettings: _*)
+  .settings(commonSettings ++ commonTestSettings : _*)
   .settings(
     libraryDependencies ++= Seq(
+      // okhttp is used by contentful as optional dependency as HTTP client
       "com.squareup.okhttp3" % "okhttp" % "3.2.0",
       "com.contentful.java" % "java-sdk" % "7.0.1"
     )
