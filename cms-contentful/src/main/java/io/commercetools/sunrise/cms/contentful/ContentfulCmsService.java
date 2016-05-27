@@ -18,9 +18,9 @@ import java.util.function.Predicate;
 
 public class ContentfulCmsService implements CmsService {
 
-    private Map<String, CDAEntry> entries;
+    final private Map<String, CDAEntry> entries;
 
-    ContentfulCmsService(Map<String, CDAEntry> entries) {
+    ContentfulCmsService(final Map<String, CDAEntry> entries) {
         this.entries = entries;
     }
 
