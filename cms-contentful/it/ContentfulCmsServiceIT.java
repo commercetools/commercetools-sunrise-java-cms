@@ -13,9 +13,7 @@ import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ContentfulCmsServiceIT {
-    private static final Locale DE = Locale.forLanguageTag("de");
-    private static final Locale EN_US = Locale.forLanguageTag("en-US");
-    private static final List<Locale> SUPPORTED_LOCALES = asList(DE, EN_US);
+    private static final List<Locale> SUPPORTED_LOCALES = asList(Locale.GERMAN, Locale.US);
 
     // credentials for contentful demo account
     private static final String SPACE_ID = "cfexampleapi";

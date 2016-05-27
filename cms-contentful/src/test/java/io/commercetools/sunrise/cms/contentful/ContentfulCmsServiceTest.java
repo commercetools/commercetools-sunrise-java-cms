@@ -21,9 +21,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class ContentfulCmsServiceTest {
-    private static final Locale DE_de = Locale.forLanguageTag("de-DE");
-    private static final Locale EN_US = Locale.forLanguageTag("en-US");
-    private static final List<Locale> SUPPORTED_LOCALES = asList(DE_de, EN_US);
+    private static final List<Locale> SUPPORTED_LOCALES = asList(Locale.GERMANY, Locale.US);
     private static final String ENTRY_TYPE = "testBanner";
     private static final String ENTRY_KEY = "firstBanner";
     private static final String FIELD_NAME = "leftTop";
@@ -112,7 +110,7 @@ public class ContentfulCmsServiceTest {
         // mock field content
         Map<String, String> mockFields = new HashMap<>();
         Map<String, Object> mockRawFields = new HashMap<>();
-        mockFields.put(DE_de.toLanguageTag(), localizedFieldContent);
+        mockFields.put(Locale.GERMANY.toLanguageTag(), localizedFieldContent);
         when(mockCdaEntry.getField(fieldName)).thenReturn(localizedFieldContent);
         mockRawFields.put(fieldName, mockFields);
         when(mockCdaEntry.rawFields()).thenReturn(mockRawFields);
