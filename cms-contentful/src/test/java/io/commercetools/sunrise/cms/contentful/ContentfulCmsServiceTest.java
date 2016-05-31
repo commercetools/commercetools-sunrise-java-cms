@@ -24,7 +24,7 @@ public class ContentfulCmsServiceTest {
     private static final String ENTRY_KEY = "firstBanner";
     private static final String FIELD_NAME = "leftTop";
     private static final String CONTENT_VALUE = "Content of left top";
-    private CDAEntry mockCdaEntry = mockEntry(ENTRY_TYPE, ENTRY_KEY, FIELD_NAME, CONTENT_VALUE);
+    private final CDAEntry mockCdaEntry = mockEntry(ENTRY_TYPE, ENTRY_KEY, FIELD_NAME, CONTENT_VALUE);
     private ContentfulCmsService contentfulCmsService;
 
     @Before
@@ -46,7 +46,7 @@ public class ContentfulCmsServiceTest {
     public void whenLanguageIsNotSupported_thenReturnOptionalEmpty() throws Exception {
         final Locale deAt = Locale.forLanguageTag("de-AT");
         final List<Locale> supportedLocales = Collections.singletonList(deAt);
-        Optional<String> content = contentfulCmsService.getLocalizedField(supportedLocales, mockCdaEntry, FIELD_NAME);
+        final Optional<String> content = contentfulCmsService.getLocalizedField(supportedLocales, mockCdaEntry, FIELD_NAME);
 
         assertThat(content).isEmpty();
     }
@@ -54,7 +54,7 @@ public class ContentfulCmsServiceTest {
     @Test
     public void whenThereIsNoMatchingFieldName_thenReturnOptionalEmpty() throws Exception {
         final String notMatchingFieldName = "notMatchingFieldName";
-        Optional<String> content = contentfulCmsService.getLocalizedField(SUPPORTED_LOCALES, mockCdaEntry, notMatchingFieldName);
+        final Optional<String> content = contentfulCmsService.getLocalizedField(SUPPORTED_LOCALES, mockCdaEntry, notMatchingFieldName);
 
         assertThat(content).isEmpty();
     }

@@ -7,6 +7,7 @@ import com.contentful.java.cda.CDAEntry;
 import io.commercetools.sunrise.cms.CmsIdentifier;
 import io.commercetools.sunrise.cms.CmsService;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -49,29 +50,29 @@ public class ContentfulCmsService implements CmsService {
         }
     }
 
-    Optional<String> getLocalizedField(List<Locale> locales, CDAEntry cdaEntry, String fieldName) {
-        Optional<Locale> localeOptional = getFirstSupportedLocale(locales, cdaEntry, fieldName);
-        Object cdaEntryField = localeOptional.map(locale -> {
+    Optional<String> getLocalizedField(final List<Locale> locales, final CDAEntry cdaEntry, final String fieldName) {
+        final Optional<Locale> localeOptional = getFirstSupportedLocale(locales, cdaEntry, fieldName);
+        final Object cdaEntryField = localeOptional.map(locale -> {
             cdaEntry.setLocale(locale.toLanguageTag());
             return cdaEntry.getField(fieldName);
         }).orElse(null);
         return getContentAccordingToFieldType(cdaEntryField);
     }
 
-    private Optional<Locale> getFirstSupportedLocale(List<Locale> locales,
-                                                     CDAEntry cdaEntry, String fieldName) {
+    private Optional<Locale> getFirstSupportedLocale(final List<Locale> locales,
+                                                     final CDAEntry cdaEntry, final String fieldName) {
         final Map<String, Object> stringObjectMap = cdaEntry.rawFields();
-        Map<String, Object> contentMap = (Map<String, Object>) stringObjectMap.get(fieldName);
+        final Map<String, Object> contentMap = (Map<String, Object>) stringObjectMap.get(fieldName);
         if (contentMap == null) {
             return Optional.empty();
         }
-        Set<String> localesFromEntry = contentMap.keySet();
+        final Set<String> localesFromEntry = contentMap.keySet();
         return locales.stream()
                 .filter(locale -> localesFromEntry.contains(locale.toLanguageTag()))
                 .findFirst();
     }
 
-    private Optional<String> getContentAccordingToFieldType(Object cdaEntryField) {
+    private Optional<String> getContentAccordingToFieldType(@Nullable final Object cdaEntryField) {
         // TODO arrays support
         if (cdaEntryField instanceof CDAAsset) {
             return Optional.of(((CDAAsset) cdaEntryField).url());
@@ -82,9 +83,9 @@ public class ContentfulCmsService implements CmsService {
         }
     }
 
-    public static ContentfulCmsService of(String spaceId, String token) {
+    public static ContentfulCmsService of(final String spaceId, final String token) {
         // TODO create contentful-cms-config class
-        CDAClient client = CDAClient
+        final CDAClient client = CDAClient
                 .builder()
                 .setSpace(spaceId)
                 .setToken(token)
