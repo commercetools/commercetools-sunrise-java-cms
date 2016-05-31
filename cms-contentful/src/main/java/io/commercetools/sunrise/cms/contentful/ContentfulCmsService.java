@@ -1,9 +1,9 @@
 package io.commercetools.sunrise.cms.contentful;
 
+import com.contentful.java.cda.CDAArray;
 import com.contentful.java.cda.CDAAsset;
 import com.contentful.java.cda.CDAClient;
 import com.contentful.java.cda.CDAEntry;
-import com.contentful.java.cda.SynchronizedSpace;
 import io.commercetools.sunrise.cms.CmsIdentifier;
 import io.commercetools.sunrise.cms.CmsService;
 
@@ -14,14 +14,17 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
-import java.util.function.Predicate;
 
 public class ContentfulCmsService implements CmsService {
 
-    final private Map<String, CDAEntry> entries;
+    private static final String ENTRY_TYPE = "content_type";
+    private static final String ENTRY_KEY = "fields.name[match]";
+    private static final String LIMIT = "limit";
+    private static final String ONE = "1";
+    private final CDAClient client;
 
-    ContentfulCmsService(final Map<String, CDAEntry> entries) {
-        this.entries = entries;
+    ContentfulCmsService(final CDAClient client) {
+        this.client = client;
     }
 
     @Override
@@ -32,23 +35,21 @@ public class ContentfulCmsService implements CmsService {
     }
 
     // TODO create models
-    private Optional<CDAEntry> getEntry(CmsIdentifier cmsIdentifier) {
-        return entries.values()
-                .stream()
-                .filter(entryPredicate(cmsIdentifier))
-                .findFirst();
+    private Optional<CDAEntry> getEntry(final CmsIdentifier cmsIdentifier) {
+        final CDAArray cdaArray = client.fetch(CDAEntry.class)
+                .where(ENTRY_TYPE, cmsIdentifier.getEntryType())
+                .where(ENTRY_KEY, cmsIdentifier.getEntryKey())
+                .where(LIMIT, ONE)
+                .all();
+        if (cdaArray != null && cdaArray.items() != null && !cdaArray.items().isEmpty()) {
+            CDAEntry cdaEntry = (CDAEntry) cdaArray.items().get(0);
+            return Optional.of(cdaEntry);
+        } else {
+            return Optional.empty();
+        }
     }
 
-    private Predicate<CDAEntry> entryPredicate(CmsIdentifier cmsIdentifier) {
-        return entry -> {
-            final String contentfulEntryType = entry.contentType().id();
-            final String contentfulEntryKey = entry.getField(entry.contentType().displayField());
-            return contentfulEntryType.equals(cmsIdentifier.getEntryType())
-                    && contentfulEntryKey.equals(cmsIdentifier.getEntryKey());
-        };
-    }
-
-    private Optional<String> getLocalizedField(List<Locale> locales, CDAEntry cdaEntry, String fieldName) {
+    Optional<String> getLocalizedField(List<Locale> locales, CDAEntry cdaEntry, String fieldName) {
         Optional<Locale> localeOptional = getFirstSupportedLocale(locales, cdaEntry, fieldName);
         Object cdaEntryField = localeOptional.map(locale -> {
             cdaEntry.setLocale(locale.toLanguageTag());
@@ -88,8 +89,6 @@ public class ContentfulCmsService implements CmsService {
                 .setSpace(spaceId)
                 .setToken(token)
                 .build();
-        // TODO cache based on SynchronisedSpace
-        SynchronizedSpace space = client.sync().fetch();
-        return new ContentfulCmsService(space.entries());
+        return new ContentfulCmsService(client);
     }
 }

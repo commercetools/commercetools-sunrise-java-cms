@@ -1,8 +1,8 @@
 package io.commercetools.sunrise.cms.contentful;
 
+import com.contentful.java.cda.CDAClient;
 import com.contentful.java.cda.CDAContentType;
 import com.contentful.java.cda.CDAEntry;
-import io.commercetools.sunrise.cms.CmsIdentifier;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -12,10 +12,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.CompletionStage;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -27,24 +23,20 @@ public class ContentfulCmsServiceTest {
     private static final String ENTRY_TYPE = "testBanner";
     private static final String ENTRY_KEY = "firstBanner";
     private static final String FIELD_NAME = "leftTop";
-    private static final String ENTRY_ID = "firstEntryId";
     private static final String CONTENT_VALUE = "Content of left top";
     private CDAEntry mockCdaEntry = mockEntry(ENTRY_TYPE, ENTRY_KEY, FIELD_NAME, CONTENT_VALUE);
     private ContentfulCmsService contentfulCmsService;
 
     @Before
     public void setUp() throws Exception {
-        Map<String, CDAEntry> entryMap = new HashMap<>();
-        entryMap.put(ENTRY_ID, mockCdaEntry);
-        contentfulCmsService = new ContentfulCmsService(entryMap);
+        CDAClient cdaClient = mock(CDAClient.class);
+        contentfulCmsService = new ContentfulCmsService(cdaClient);
     }
 
     // TODO test assets
     @Test
     public void whenSearchedContentExists_thenReturnIt() throws Exception {
-        CmsIdentifier identifier = CmsIdentifier.ofEntryTypeAndKeyAndField(ENTRY_TYPE, ENTRY_KEY, FIELD_NAME);
-
-        Optional<String> content = waitAndGet(contentfulCmsService.get(SUPPORTED_LOCALES, identifier));
+        final Optional<String> content = contentfulCmsService.getLocalizedField(SUPPORTED_LOCALES, mockCdaEntry, FIELD_NAME);
 
         assertThat(content).isPresent();
         assertThat(content.get()).isEqualTo(CONTENT_VALUE);
@@ -53,10 +45,8 @@ public class ContentfulCmsServiceTest {
     @Test
     public void whenLanguageIsNotSupported_thenReturnOptionalEmpty() throws Exception {
         final Locale deAt = Locale.forLanguageTag("de-AT");
-        List<Locale> supportedLocales = Collections.singletonList(deAt);
-        CmsIdentifier identifier = CmsIdentifier.ofEntryTypeAndKeyAndField(ENTRY_TYPE, ENTRY_KEY, FIELD_NAME);
-
-        Optional<String> content = waitAndGet(contentfulCmsService.get(supportedLocales, identifier));
+        final List<Locale> supportedLocales = Collections.singletonList(deAt);
+        Optional<String> content = contentfulCmsService.getLocalizedField(supportedLocales, mockCdaEntry, FIELD_NAME);
 
         assertThat(content).isEmpty();
     }
@@ -64,35 +54,9 @@ public class ContentfulCmsServiceTest {
     @Test
     public void whenThereIsNoMatchingFieldName_thenReturnOptionalEmpty() throws Exception {
         final String notMatchingFieldName = "notMatchingFieldName";
-        CmsIdentifier identifier = CmsIdentifier.ofEntryTypeAndKeyAndField(ENTRY_TYPE, ENTRY_KEY, notMatchingFieldName);
-
-        Optional<String> content = waitAndGet(contentfulCmsService.get(SUPPORTED_LOCALES, identifier));
+        Optional<String> content = contentfulCmsService.getLocalizedField(SUPPORTED_LOCALES, mockCdaEntry, notMatchingFieldName);
 
         assertThat(content).isEmpty();
-    }
-
-    @Test
-    public void whenThereIsNoMatchingEntryKey_thenReturnOptionalEmpty() throws Exception {
-        final String notMatchingEntryKey = "notMatchingEntryKey";
-        CmsIdentifier identifier = CmsIdentifier.ofEntryTypeAndKeyAndField(ENTRY_TYPE, notMatchingEntryKey, FIELD_NAME);
-
-        Optional<String> content = waitAndGet(contentfulCmsService.get(SUPPORTED_LOCALES, identifier));
-
-        assertThat(content).isEmpty();
-    }
-
-    @Test
-    public void whenThereIsNoMatchingEntryType_thenReturnOptionalEmpty() throws Exception {
-        final String notMatchingEntryType = "notMatchingEntryType";
-        CmsIdentifier identifier = CmsIdentifier.ofEntryTypeAndKeyAndField(notMatchingEntryType, ENTRY_KEY, FIELD_NAME);
-
-        Optional<String> content = waitAndGet(contentfulCmsService.get(SUPPORTED_LOCALES, identifier));
-
-        assertThat(content).isEmpty();
-    }
-
-    private <T> T waitAndGet(final CompletionStage<T> stage) throws InterruptedException, ExecutionException, TimeoutException {
-        return stage.toCompletableFuture().get(5, TimeUnit.SECONDS);
     }
 
     private CDAEntry mockEntry(String entryType, String entryKey, String fieldName, String localizedFieldContent) {
