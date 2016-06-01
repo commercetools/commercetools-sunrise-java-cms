@@ -42,12 +42,9 @@ public class ContentfulCmsService implements CmsService {
                 .where(ENTRY_KEY, cmsIdentifier.getEntryKey())
                 .where(LIMIT, ONE)
                 .all();
-        if (cdaArray != null && cdaArray.items() != null && !cdaArray.items().isEmpty()) {
-            CDAEntry cdaEntry = (CDAEntry) cdaArray.items().get(0);
-            return Optional.of(cdaEntry);
-        } else {
-            return Optional.empty();
-        }
+        return Optional.ofNullable(cdaArray)
+                .filter(e -> e.items() != null && !e.items().isEmpty())
+                .map(e -> (CDAEntry) e.items().get(0));
     }
 
     Optional<String> getLocalizedField(final List<Locale> locales, final CDAEntry cdaEntry, final String fieldName) {
