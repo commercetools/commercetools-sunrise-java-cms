@@ -32,8 +32,7 @@ public class ContentfulCmsServiceIT {
         CmsIdentifier identifier = CmsIdentifier.ofEntryTypeAndKeyAndField("human", "Finn", "description");
         Optional<String> content = waitAndGet(contentfulCmsService.get(SUPPORTED_LOCALES, identifier));
 
-        assertThat(content).isPresent();
-        assertThat(content.get()).isEqualTo("Fearless adventurer! Defender of pancakes.");
+        assertThat(content).contains("Fearless adventurer! Defender of pancakes.");
     }
 
     @Test
@@ -49,8 +48,7 @@ public class ContentfulCmsServiceIT {
         CmsIdentifier identifier = CmsIdentifier.ofEntryTypeAndKeyAndField("dog", "Jake", "image");
         Optional<String> content = waitAndGet(contentfulCmsService.get(SUPPORTED_LOCALES, identifier));
 
-        assertThat(content).isPresent();
-        assertThat(content.get()).isEqualTo("//images.contentful.com/cfexampleapi/4hlteQAXS8iS0YCMU6QMWg/2a4d826144f014109364ccf5c891d2dd/jake.png");
+        assertThat(content).contains("//images.contentful.com/cfexampleapi/4hlteQAXS8iS0YCMU6QMWg/2a4d826144f014109364ccf5c891d2dd/jake.png");
     }
 
     @Test

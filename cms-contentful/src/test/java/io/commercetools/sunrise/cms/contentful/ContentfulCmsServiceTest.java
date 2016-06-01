@@ -38,8 +38,7 @@ public class ContentfulCmsServiceTest {
     public void whenSearchedContentExists_thenReturnIt() throws Exception {
         final Optional<String> content = contentfulCmsService.getLocalizedField(SUPPORTED_LOCALES, mockCdaEntry, FIELD_NAME);
 
-        assertThat(content).isPresent();
-        assertThat(content.get()).isEqualTo(CONTENT_VALUE);
+        assertThat(content).contains(CONTENT_VALUE);
     }
 
     @Test
