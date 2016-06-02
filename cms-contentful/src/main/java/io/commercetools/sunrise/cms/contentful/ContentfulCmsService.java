@@ -69,19 +69,19 @@ public class ContentfulCmsService implements CmsService {
         return future;
     }
 
-    Optional<String> getLocalizedField(final List<Locale> locales, final CDAEntry cdaEntry, final String fieldName) {
-        final Optional<Locale> localeOptional = getFirstSupportedLocale(locales, cdaEntry, fieldName);
+    Optional<String> getLocalizedField(final List<Locale> locales, final CDAEntry cdaEntry, final String fieldId) {
+        final Optional<Locale> localeOptional = getFirstSupportedLocale(locales, cdaEntry, fieldId);
         final Object cdaEntryField = localeOptional.map(locale -> {
             cdaEntry.setLocale(locale.toLanguageTag());
-            return cdaEntry.getField(fieldName);
+            return cdaEntry.getField(fieldId);
         }).orElse(null);
         return getContentAccordingToFieldType(cdaEntryField);
     }
 
     private Optional<Locale> getFirstSupportedLocale(final List<Locale> locales,
-                                                     final CDAEntry cdaEntry, final String fieldName) {
+                                                     final CDAEntry cdaEntry, final String fieldId) {
         final Map<String, Object> rawFields = cdaEntry.rawFields();
-        final Map<String, Object> localeContentMap = getLocaleContentMap(fieldName, rawFields);
+        final Map<String, Object> localeContentMap = getLocaleContentMap(fieldId, rawFields);
         return Optional.ofNullable(localeContentMap).flatMap(map -> {
             final Set<String> allSupportedLocales = map.keySet();
             return locales.stream()
