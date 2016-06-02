@@ -74,19 +74,22 @@ public class ContentfulCmsService implements CmsService {
 
     private Optional<Locale> getFirstSupportedLocale(final List<Locale> locales,
                                                      final CDAEntry cdaEntry, final String fieldName) {
-        final Map<String, Object> stringObjectMap = cdaEntry.rawFields();
-        final Map<String, Object> contentMap = (Map<String, Object>) stringObjectMap.get(fieldName);
-        if (contentMap == null) {
-            return Optional.empty();
-        }
-        final Set<String> localesFromEntry = contentMap.keySet();
-        return locales.stream()
-                .filter(locale -> localesFromEntry.contains(locale.toLanguageTag()))
+        final Map<String, Object> rawFields = cdaEntry.rawFields();
+        final Map<String, Object> localeContentMap = getLocaleContentMap(fieldName, rawFields);
+        return Optional.ofNullable(localeContentMap).flatMap(map -> {
+            final Set<String> allSupportedLocales = map.keySet();
+            return locales.stream()
+                .filter(locale -> allSupportedLocales.contains(locale.toLanguageTag()))
                 .findFirst();
+        });
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> getLocaleContentMap(String fieldName, Map<String, Object> rawFields) {
+        return (Map<String, Object>) rawFields.get(fieldName);
     }
 
     private Optional<String> getContentAccordingToFieldType(@Nullable final Object cdaEntryField) {
-        // TODO arrays support
         if (cdaEntryField instanceof CDAAsset) {
             return Optional.of(((CDAAsset) cdaEntryField).url());
         } else if (cdaEntryField instanceof String) {
