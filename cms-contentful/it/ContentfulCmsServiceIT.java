@@ -28,6 +28,15 @@ public class ContentfulCmsServiceIT {
     }
 
     @Test
+    public void whenCouldNotFetchEntry_thenReturnOptionalEmpty() throws Exception {
+        final ContentfulCmsService cmsService = ContentfulCmsService.of("", "");
+        final CmsIdentifier cmsIdentifier = CmsIdentifier.of("entryType:entryKey.fieldName");
+        final Optional<String> content = waitAndGet(cmsService.get(SUPPORTED_LOCALES, cmsIdentifier));
+
+        assertThat(content).isEmpty();
+    }
+
+    @Test
     public void whenAskForExistingStringContentThenGet() throws Exception {
         CmsIdentifier identifier = CmsIdentifier.ofEntryTypeAndKeyAndField("human", "Finn", "description");
         Optional<String> content = waitAndGet(contentfulCmsService.get(SUPPORTED_LOCALES, identifier));

@@ -32,14 +32,20 @@ public class ContentfulCmsService implements CmsService {
     @Override
     public CompletionStage<Optional<String>> get(final List<Locale> locales, final CmsIdentifier cmsIdentifier) {
         return getEntry(cmsIdentifier)
-                .thenApplyAsync(cdaEntryOptional -> cdaEntryOptional
+                .thenApply(cdaEntryOptional -> cdaEntryOptional
                         .flatMap(cdaEntry -> getLocalizedField(locales, cdaEntry, cmsIdentifier.getFieldName())));
     }
 
     private CompletionStage<Optional<CDAEntry>> getEntry(final CmsIdentifier cmsIdentifier) {
-        return fetchEntry(cmsIdentifier).thenApply(cdaArray -> Optional.ofNullable(cdaArray)
-                .filter(e -> e.items() != null && !e.items().isEmpty())
-                .map(e -> (CDAEntry) e.items().get(0)));
+        return fetchEntry(cmsIdentifier).handle((cdaArray, error) -> {
+            if (error != null) {
+                return Optional.empty();
+            } else {
+                return Optional.ofNullable(cdaArray)
+                        .filter(e -> e.items() != null && !e.items().isEmpty())
+                        .map(e -> (CDAEntry) e.items().get(0));
+            }
+        });
     }
 
     private CompletionStage<CDAArray> fetchEntry(final CmsIdentifier cmsIdentifier) {
