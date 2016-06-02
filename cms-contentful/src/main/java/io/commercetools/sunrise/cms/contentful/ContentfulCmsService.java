@@ -21,8 +21,8 @@ public class ContentfulCmsService implements CmsService {
 
     private static final String ENTRY_TYPE = "content_type";
     private static final String ENTRY_KEY = "fields.name[match]";
-    private static final String LIMIT = "limit";
-    private static final String ONE = "1";
+    private static final String CDA_LIMIT_KEY = "limit";
+    private static final String LIMIT = "1";
     private final CDAClient client;
 
     ContentfulCmsService(final CDAClient client) {
@@ -58,7 +58,7 @@ public class ContentfulCmsService implements CmsService {
         client.fetch(CDAEntry.class)
                 .where(ENTRY_TYPE, cmsIdentifier.getEntryType())
                 .where(ENTRY_KEY, cmsIdentifier.getEntryKey())
-                .where(LIMIT, ONE)
+                .where(CDA_LIMIT_KEY, LIMIT)
                 .all(callback);
         return future;
     }
