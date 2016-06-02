@@ -58,6 +58,14 @@ public class ContentfulCmsServiceTest {
         assertThat(content).isEmpty();
     }
 
+    @Test
+    public void whenEntryDoesNotHaveRequiredField_thenReturnOptionalEmpty() throws Exception {
+        final CDAEntry mockEntry = mockEntry(ENTRY_TYPE, ENTRY_KEY, "", CONTENT_VALUE);
+        final Optional<String> content = contentfulCmsService.getLocalizedField(SUPPORTED_LOCALES, mockEntry, FIELD_NAME);
+
+        assertThat(content).isEmpty();
+    }
+
     private CDAEntry mockEntry(String entryType, String entryKey, String fieldName, String localizedFieldContent) {
         final String entryTitle = "name";
         CDAEntry mockCdaEntry = mock(CDAEntry.class);
