@@ -37,15 +37,9 @@ public class ContentfulCmsService implements CmsService {
     }
 
     private CompletionStage<Optional<CDAEntry>> getEntry(final CmsIdentifier cmsIdentifier) {
-        return fetchEntry(cmsIdentifier).handle((cdaArray, error) -> {
-            if (error != null) {
-                return Optional.empty();
-            } else {
-                return Optional.ofNullable(cdaArray)
-                        .filter(e -> e.items() != null && !e.items().isEmpty())
-                        .map(e -> (CDAEntry) e.items().get(0));
-            }
-        });
+        return fetchEntry(cmsIdentifier).thenApply(cdaArray -> Optional.ofNullable(cdaArray)
+                .filter(e -> e.items() != null && !e.items().isEmpty())
+                .map(e -> (CDAEntry) e.items().get(0)));
     }
 
     private CompletionStage<CDAArray> fetchEntry(final CmsIdentifier cmsIdentifier) {

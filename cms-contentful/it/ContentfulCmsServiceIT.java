@@ -27,13 +27,11 @@ public class ContentfulCmsServiceIT {
         contentfulCmsService = ContentfulCmsService.of(SPACE_ID, TOKEN);
     }
 
-    @Test
+    @Test(expected=ExecutionException.class)
     public void whenCouldNotFetchEntry_thenReturnOptionalEmpty() throws Exception {
         final ContentfulCmsService cmsService = ContentfulCmsService.of("", "");
         final CmsIdentifier cmsIdentifier = CmsIdentifier.of("entryType:entryKey.fieldName");
-        final Optional<String> content = waitAndGet(cmsService.get(SUPPORTED_LOCALES, cmsIdentifier));
-
-        assertThat(content).isEmpty();
+        waitAndGet(cmsService.get(SUPPORTED_LOCALES, cmsIdentifier));
     }
 
     @Test
