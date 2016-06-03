@@ -13,6 +13,7 @@ import java.util.concurrent.TimeoutException;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.ThrowableAssert.catchThrowable;
 
 public class ContentfulCmsServiceIT {
     private static final List<Locale> SUPPORTED_LOCALES = asList(Locale.GERMAN, Locale.US);
@@ -27,11 +28,14 @@ public class ContentfulCmsServiceIT {
         contentfulCmsService = ContentfulCmsService.of(SPACE_ID, TOKEN);
     }
 
-    @Test(expected=ExecutionException.class)
-    public void whenCouldNotFetchEntry_thenReturnOptionalEmpty() throws Exception {
+    @Test
+    public void whenCouldNotFetchEntry_thenThrowException() throws Exception {
         final ContentfulCmsService cmsService = ContentfulCmsService.of("", "");
         final CmsIdentifier cmsIdentifier = CmsIdentifier.of("entryType:entryKey.fieldName");
-        waitAndGet(cmsService.get(SUPPORTED_LOCALES, cmsIdentifier));
+
+        Throwable thrown = catchThrowable(() -> waitAndGet(cmsService.get(SUPPORTED_LOCALES, cmsIdentifier)));
+
+        assertThat(thrown).isInstanceOf(ExecutionException.class).hasMessageContaining("Unauthorized");
     }
 
     @Test
