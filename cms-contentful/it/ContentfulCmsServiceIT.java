@@ -45,7 +45,7 @@ public class ContentfulCmsServiceIT {
 
         Throwable thrown = catchThrowable(() -> waitAndGet(cmsService.get(SUPPORTED_LOCALES, cmsIdentifier)));
 
-        assertThat(thrown).isInstanceOf(ExecutionException.class).hasMessageContaining("Unauthorized");
+        assertThat(thrown).isInstanceOf(ExecutionException.class).hasMessageContaining("Could not fetch content for entry type:");
         assertThat(thrown).hasCauseInstanceOf(CmsServiceException.class);
     }
 

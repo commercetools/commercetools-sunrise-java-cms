@@ -38,8 +38,8 @@ public class ContentfulCmsService implements CmsService {
      * @param locales the list of locales used to translate the message
      * @param cmsIdentifier identifier of the CMS entry field
      * @return the {@code completionStage} of the content in the first found given language,
-     * or absent if it could not be found, or a {@link CmsServiceException} if there was problem
-     * during fetching response from Contentful.
+     * or absent if it could not be found, or a {@link CmsServiceException} if there was a problem
+     * when obtaining the content from Contentful.
      */
     @Override
     public CompletionStage<Optional<String>> get(final List<Locale> locales, final CmsIdentifier cmsIdentifier) {
@@ -64,7 +64,7 @@ public class ContentfulCmsService implements CmsService {
 
             @Override
             protected void onFailure(final Throwable error) {
-                future.completeExceptionally(new CmsServiceException(error.getMessage(), error.getCause()));
+                future.completeExceptionally(new CmsServiceException("Could not fetch content for " + cmsIdentifier.toString(), error));
             }
         };
         client.fetch(CDAEntry.class)

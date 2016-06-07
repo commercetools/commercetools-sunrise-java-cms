@@ -71,4 +71,11 @@ public final class CmsIdentifier {
         final boolean containsPosition = array.length > position;
         return containsPosition ? array[position] : defaultValue;
     }
+
+    @Override
+    public String toString() {
+        return "entry type: '" + this.entryType +
+                "', entry key: '" + this.entryKey +
+                "', field name: '" + this.fieldName + "'";
+    }
 }
