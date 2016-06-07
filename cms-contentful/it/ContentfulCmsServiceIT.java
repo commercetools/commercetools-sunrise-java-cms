@@ -19,13 +19,22 @@ public class ContentfulCmsServiceIT {
     private static final List<Locale> SUPPORTED_LOCALES = asList(Locale.GERMAN, Locale.US);
 
     // credentials for contentful demo account
-    private static final String SPACE_ID = "cfexampleapi";
-    private static final String TOKEN = "b4c0n73n7fu1";
+    private static final String IT_PREFIX = "CONTENTFUL_";
+    private static final String IT_CF_SPACE_ID = IT_PREFIX + "SPACE_ID";
+    private static final String IT_CF_TOKEN = IT_PREFIX + "TOKEN";
     private ContentfulCmsService contentfulCmsService;
+
+    private static String spaceId() {
+        return getValueForEnvVar(IT_CF_SPACE_ID);
+    }
+
+    private static String token() {
+        return getValueForEnvVar(IT_CF_TOKEN);
+    }
 
     @Before
     public void setUp() throws Exception {
-        contentfulCmsService = ContentfulCmsService.of(SPACE_ID, TOKEN);
+        contentfulCmsService = ContentfulCmsService.of(spaceId(), token());
     }
 
     @Test
@@ -72,6 +81,14 @@ public class ContentfulCmsServiceIT {
 
     private <T> T waitAndGet(final CompletionStage<T> stage) throws InterruptedException, ExecutionException, TimeoutException {
         return stage.toCompletableFuture().get(5, TimeUnit.SECONDS);
+    }
+
+    private static String getValueForEnvVar(final String key) {
+        return Optional.ofNullable(System.getenv(key))
+                .orElseThrow(() -> new RuntimeException(
+                        "Missing environment variable " + key + ", please provide the following environment variables for the integration test:\n" +
+                                "export " + IT_CF_SPACE_ID + "=\"Your Contentful project key\"\n" +
+                                "export " + IT_CF_TOKEN + "=\"Your Contentful authentication token\"\n"));
     }
 
 }
