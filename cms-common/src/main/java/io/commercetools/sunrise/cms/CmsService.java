@@ -11,21 +11,12 @@ import java.util.concurrent.CompletionStage;
 @FunctionalInterface
 public interface CmsService {
 
-     /**
-     * Gets the content corresponding to the given CMS identifier for the first found given language.
-     * @param locales the list of locales used to translate the message
-     * @param cmsIdentifier identifier of the CMS entry field
-     * @return the {@code completionStage} of the content in the first found given language, or absent if it could not be found
-     */
-    CompletionStage<Optional<String>> get(final List<Locale> locales, final CmsIdentifier cmsIdentifier);
-
     /**
-     * Gets the content corresponding to the given CMS identifier for the first found given language.
-     * @param locales the list of locales used to translate the message
-     * @param cmsIdentifier identifier of the CMS content
-     * @return the {@code completionStage} of the content in the first found given language, or empty string if it could not be found
+     * Gets the page content corresponding to the given key.
+     * @param pageKey identifying the page
+     * @param locales for the localized content inside the page
+     * @return a {@code CompletionStage} containing the page content identified by the key
      */
-    default CompletionStage<String> getOrEmpty(final List<Locale> locales, final CmsIdentifier cmsIdentifier) {
-        return get(locales, cmsIdentifier).thenApply(content -> content.orElse(""));
-    }
+    CompletionStage<Optional<CmsPage>> get(final String pageKey, final List<Locale> locales);
+
 }
