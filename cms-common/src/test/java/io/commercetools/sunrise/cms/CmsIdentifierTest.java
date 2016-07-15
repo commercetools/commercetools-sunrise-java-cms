@@ -21,4 +21,11 @@ public class CmsIdentifierTest {
         assertThat(identifier.getEntryKey()).isEmpty();
         assertThat(identifier.getFieldName()).isEmpty();
     }
+
+    @Test
+    public void createsString() throws Exception {
+        final CmsIdentifier identifier = CmsIdentifier.of("entryType:entryKey.some.field");
+        assertThat(identifier.toString()).isEqualTo("entry type: 'entryType', entry key: 'entryKey', field name: 'some.field'");
+    }
+
 }
