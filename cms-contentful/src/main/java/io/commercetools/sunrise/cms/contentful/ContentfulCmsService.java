@@ -7,6 +7,7 @@ import com.contentful.java.cda.CDAClient;
 import com.contentful.java.cda.CDAEntry;
 import io.commercetools.sunrise.cms.CmsIdentifier;
 import io.commercetools.sunrise.cms.CmsService;
+import io.commercetools.sunrise.cms.CmsServiceException;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -17,6 +18,9 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
+/**
+ * Service that provides page content, coming from Contentful.
+ */
 public class ContentfulCmsService implements CmsService {
 
     private static final String ENTRY_TYPE = "content_type";
@@ -29,6 +33,15 @@ public class ContentfulCmsService implements CmsService {
         this.client = client;
     }
 
+    
+    /**
+     * Gets the content corresponding to the given CMS identifier for the first found given language.
+     * @param locales the list of locales used to translate the message
+     * @param cmsIdentifier identifier of the CMS entry field
+     * @return the {@code completionStage} of the content in the first found given language,
+     * or absent if it could not be found, or a {@link CmsServiceException} if there was a problem
+     * when obtaining the content from Contentful.
+     */
     @Override
     public CompletionStage<Optional<String>> get(final List<Locale> locales, final CmsIdentifier cmsIdentifier) {
         return getEntry(cmsIdentifier)
@@ -52,7 +65,7 @@ public class ContentfulCmsService implements CmsService {
 
             @Override
             protected void onFailure(final Throwable error) {
-                future.completeExceptionally(error);
+                future.completeExceptionally(new CmsServiceException("Could not fetch content for " + cmsIdentifier.toString(), error));
             }
         };
         client.fetch(CDAEntry.class)
@@ -99,6 +112,9 @@ public class ContentfulCmsService implements CmsService {
         }
     }
 
+    /**
+     * Creates new instance of ContentfulCmsService based on Contentful account credentials
+     */
     public static ContentfulCmsService of(final String spaceId, final String token) {
         // TODO create contentful-cms-config class
         final CDAClient client = CDAClient

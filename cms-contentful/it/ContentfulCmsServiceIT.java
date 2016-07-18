@@ -1,4 +1,5 @@
 import io.commercetools.sunrise.cms.CmsIdentifier;
+import io.commercetools.sunrise.cms.CmsServiceException;
 import io.commercetools.sunrise.cms.contentful.ContentfulCmsService;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,7 +45,8 @@ public class ContentfulCmsServiceIT {
 
         Throwable thrown = catchThrowable(() -> waitAndGet(cmsService.get(SUPPORTED_LOCALES, cmsIdentifier)));
 
-        assertThat(thrown).isInstanceOf(ExecutionException.class).hasMessageContaining("Unauthorized");
+        assertThat(thrown).isInstanceOf(ExecutionException.class).hasMessageContaining("Could not fetch content for entry type:");
+        assertThat(thrown).hasCauseInstanceOf(CmsServiceException.class);
     }
 
     @Test
