@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.ThrowableAssert.catchThrowable;
 
 public class ContentfulCmsServiceIT {
-    private static final List<Locale> SUPPORTED_LOCALES = asList(Locale.GERMAN, Locale.US);
+    private static final List<Locale> SUPPORTED_LOCALES = asList(Locale.GERMANY, Locale.US);
 
     // credentials for contentful demo account
     private static final String IT_PREFIX = "CONTENTFUL_";
@@ -69,7 +69,7 @@ public class ContentfulCmsServiceIT {
     public void whenAskForExistingAssetContentThenGet() throws Exception {
         Optional<CmsPage> content = waitAndGet(contentfulCmsService.get("jacke", SUPPORTED_LOCALES));
         assertThat(content).isPresent();
-        assertThat(content.get().getOrEmpty("pageContent.image")).isEqualToIgnoringCase("//images.contentful.com/1d61yybg0mzf/3NtARkX3tYQOaCw2MG86is/95381cd0170fc38092237bdcb6fce4a8/jake.png");
+        assertThat(content.get().getOrEmpty("pageContent.image")).isEqualToIgnoringCase("//images.contentful.com/l6chdlzlf8jn/2iVeCh1FGoy00Oq8WEI2aI/93c3f0841fcf59743f57e238f6ed67aa/jake.png");
     }
 
     @Test
