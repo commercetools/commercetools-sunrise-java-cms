@@ -1,20 +1,16 @@
 package io.commercetools.sunrise.cms.contentful;
 
 import com.contentful.java.cda.CDAArray;
-import com.contentful.java.cda.CDAAsset;
 import com.contentful.java.cda.CDACallback;
 import com.contentful.java.cda.CDAClient;
 import com.contentful.java.cda.CDAEntry;
-import io.commercetools.sunrise.cms.CmsIdentifier;
+import io.commercetools.sunrise.cms.CmsPage;
 import io.commercetools.sunrise.cms.CmsService;
 import io.commercetools.sunrise.cms.CmsServiceException;
 
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
@@ -24,38 +20,44 @@ import java.util.concurrent.CompletionStage;
 public class ContentfulCmsService implements CmsService {
 
     private static final String ENTRY_TYPE = "content_type";
-    private static final String ENTRY_KEY = "fields.name[match]";
+    private static final String ENTRY_KEY_QUERY_PREFIX = "fields.";
     private static final String CDA_LIMIT_KEY = "limit";
     private static final String LIMIT = "1";
+    private static final String INCLUDE_LEVELS_KEY = "include";
+    private static final String INCLUDE_MAX_LEVEL = "10";
     private final CDAClient client;
+    private final String pageTypeName;
+    private final String pageTypeIdFieldName;
 
-    ContentfulCmsService(final CDAClient client) {
+    private ContentfulCmsService(final CDAClient client, String pageTypeName, String pageTypeIdFieldName) {
         this.client = client;
+        this.pageTypeName = pageTypeName;
+        this.pageTypeIdFieldName = pageTypeIdFieldName;
     }
 
-    
     /**
-     * Gets the content corresponding to the given CMS identifier for the first found given language.
-     * @param locales the list of locales used to translate the message
-     * @param cmsIdentifier identifier of the CMS entry field
-     * @return the {@code completionStage} of the content in the first found given language,
+     * Gets the page content corresponding to the given key.
+     * @param pageKey identifying the page
+     * @param locales for the localized content inside the page
+     * @return a {@code CompletionStage} containing the page content identified by the key,
      * or absent if it could not be found, or a {@link CmsServiceException} if there was a problem
      * when obtaining the content from Contentful.
      */
     @Override
-    public CompletionStage<Optional<String>> get(final List<Locale> locales, final CmsIdentifier cmsIdentifier) {
-        return getEntry(cmsIdentifier)
+    public CompletionStage<Optional<CmsPage>> get(final String pageKey, final List<Locale> locales) {
+        return getEntry(pageKey)
                 .thenApply(cdaEntryOptional -> cdaEntryOptional
-                        .flatMap(cdaEntry -> getLocalizedField(locales, cdaEntry, cmsIdentifier.getFieldName())));
+                        .map(cdaEntry ->
+                                new ContentfulCmsPage(cdaEntry, locales)));
     }
 
-    private CompletionStage<Optional<CDAEntry>> getEntry(final CmsIdentifier cmsIdentifier) {
-        return fetchEntry(cmsIdentifier).thenApply(cdaArray -> Optional.ofNullable(cdaArray)
+    private CompletionStage<Optional<CDAEntry>> getEntry(final String pageKey) {
+        return fetchEntry(pageKey).thenApply(cdaArray -> Optional.ofNullable(cdaArray)
                 .filter(e -> e.items() != null && !e.items().isEmpty())
                 .map(e -> (CDAEntry) e.items().get(0)));
     }
 
-    private CompletionStage<CDAArray> fetchEntry(final CmsIdentifier cmsIdentifier) {
+    private CompletionStage<CDAArray> fetchEntry(final String pageKey) {
         final CompletableFuture<CDAArray> future = new CompletableFuture<>();
         final CDACallback<CDAArray> callback = new CDACallback<CDAArray>(){
             @Override
@@ -65,63 +67,35 @@ public class ContentfulCmsService implements CmsService {
 
             @Override
             protected void onFailure(final Throwable error) {
-                future.completeExceptionally(new CmsServiceException("Could not fetch content for " + cmsIdentifier.toString(), error));
+                // check an exception when entry type doesn't exist
+                if (error.getMessage().contains("Bad Request")) {
+                    future.complete(null);
+                } else {
+                    future.completeExceptionally(new CmsServiceException("Could not fetch content for " + pageKey,
+                            error));
+                }
             }
         };
         client.fetch(CDAEntry.class)
-                .where(ENTRY_TYPE, cmsIdentifier.getEntryType())
-                .where(ENTRY_KEY, cmsIdentifier.getEntryKey())
+                .where(ENTRY_TYPE, pageTypeName)
+                .where(ENTRY_KEY_QUERY_PREFIX + pageTypeIdFieldName, pageKey)
                 .where(CDA_LIMIT_KEY, LIMIT)
+                .where(INCLUDE_LEVELS_KEY, INCLUDE_MAX_LEVEL)
                 .all(callback);
         return future;
-    }
-
-    Optional<String> getLocalizedField(final List<Locale> locales, final CDAEntry cdaEntry, final String fieldId) {
-        final Optional<Locale> localeOptional = getFirstSupportedLocale(locales, cdaEntry, fieldId);
-        final Object cdaEntryField = localeOptional.map(locale -> {
-            cdaEntry.setLocale(locale.toLanguageTag());
-            return cdaEntry.getField(fieldId);
-        }).orElse(null);
-        return getContentAccordingToFieldType(cdaEntryField);
-    }
-
-    private Optional<Locale> getFirstSupportedLocale(final List<Locale> locales,
-                                                     final CDAEntry cdaEntry, final String fieldId) {
-        final Map<String, Object> rawFields = cdaEntry.rawFields();
-        final Map<String, Object> localeContentMap = getLocaleContentMap(fieldId, rawFields);
-        return Optional.ofNullable(localeContentMap).flatMap(map -> {
-            final Set<String> allSupportedLocales = map.keySet();
-            return locales.stream()
-                .filter(locale -> allSupportedLocales.contains(locale.toLanguageTag()))
-                .findFirst();
-        });
-    }
-
-    @SuppressWarnings("unchecked")
-    private Map<String, Object> getLocaleContentMap(String fieldName, Map<String, Object> rawFields) {
-        return (Map<String, Object>) rawFields.get(fieldName);
-    }
-
-    private Optional<String> getContentAccordingToFieldType(@Nullable final Object cdaEntryField) {
-        if (cdaEntryField instanceof CDAAsset) {
-            return Optional.of(((CDAAsset) cdaEntryField).url());
-        } else if (cdaEntryField instanceof String) {
-            return Optional.of(cdaEntryField.toString());
-        } else {
-            return Optional.empty();
-        }
     }
 
     /**
      * Creates new instance of ContentfulCmsService based on Contentful account credentials
      */
-    public static ContentfulCmsService of(final String spaceId, final String token) {
+    public static ContentfulCmsService of(final String spaceId, final String token, final String pageTypeName,
+                                          final String pageTypeIdFieldName) {
         // TODO create contentful-cms-config class
         final CDAClient client = CDAClient
                 .builder()
                 .setSpace(spaceId)
                 .setToken(token)
                 .build();
-        return new ContentfulCmsService(client);
+        return new ContentfulCmsService(client, pageTypeName, pageTypeIdFieldName);
     }
 }
