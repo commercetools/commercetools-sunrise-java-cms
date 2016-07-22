@@ -7,7 +7,6 @@ import io.commercetools.sunrise.cms.CmsPage;
 import io.commercetools.sunrise.cms.contentful.models.FieldTypes;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 
@@ -28,10 +27,19 @@ public class ContentfulCmsPage implements CmsPage  {
         if (StringUtils.isEmpty(fieldName)) {
             return Optional.empty();
         }
-        final FieldIdentifier fieldIdentifier = new FieldIdentifier(fieldName);
-        return Optional.ofNullable(getEntryWithContentField(cdaEntry, fieldIdentifier))
+        final List<String> allNames = new ArrayList<>(Arrays.asList(split(fieldName, ".")));
+        return Optional.ofNullable(getEntryWithContentField(cdaEntry, getEntryNamesList(allNames)))
                 .flatMap(entryWithContentField ->
-                        getContent(entryWithContentField, fieldIdentifier.contentFieldName));
+                        getContent(entryWithContentField, getContentFieldName(allNames)));
+    }
+
+    private String getContentFieldName(List<String> allNames) {
+        return allNames.size() > 1 ? allNames.get(allNames.size() - 1) : allNames.get(0);
+    }
+
+    private List<String> getEntryNamesList(List<String> allNames) {
+        return allNames.size() > 1 ?
+                allNames.subList(0, allNames.size() - 1) : Collections.emptyList();
     }
 
     private Optional<String> getContent(final CDAEntry entry, final String contentFieldName) {
@@ -44,16 +52,16 @@ public class ContentfulCmsPage implements CmsPage  {
                         }));
     }
 
-    private CDAEntry getEntryWithContentField(@Nullable final CDAEntry cdaEntry, final FieldIdentifier fieldIdentifier) {
-        if (fieldIdentifier.isLastLevelEntry()) {
+    private CDAEntry getEntryWithContentField(@Nullable final CDAEntry cdaEntry, final List<String> entryNamesList) {
+        if (entryNamesList.isEmpty()) {
             return cdaEntry;
         } else {
-            final String key = fieldIdentifier.getCurrentEntryName();
+            final String key = entryNamesList.get(0);
             if (cdaEntry != null && cdaEntry.rawFields().containsKey(key)) {
                 Object item = cdaEntry.getField(key);
                 if (item instanceof CDAEntry) {
-                    fieldIdentifier.removeCurrentEntryName();
-                    return getEntryWithContentField((CDAEntry) item, fieldIdentifier);
+                    entryNamesList.remove(0);
+                    return getEntryWithContentField((CDAEntry) item, entryNamesList);
                 }
             }
             return null;
@@ -102,36 +110,6 @@ public class ContentfulCmsPage implements CmsPage  {
     @SuppressWarnings("unchecked")
     private Map<String, Object> getLocaleContentMap(String fieldName, Map<String, Object> rawFields) {
         return (Map<String, Object>) rawFields.get(fieldName);
-    }
-
-    private class FieldIdentifier {
-
-        private List<String> entryNamesList = Collections.emptyList();
-
-        private String contentFieldName = "";
-
-        FieldIdentifier(@Nonnull final String fieldName) {
-            List<String> allNames = new ArrayList<>(Arrays.asList(split(fieldName, ".")));
-            if (allNames.size() > 1) {
-                final int lastIndex = allNames.size() - 1;
-                entryNamesList = allNames.subList(0, lastIndex);
-                contentFieldName = allNames.get(lastIndex);
-            } else {
-                contentFieldName = allNames.get(0);
-            }
-        }
-
-        String getCurrentEntryName() {
-            return entryNamesList.get(0);
-        }
-
-        boolean isLastLevelEntry() {
-            return entryNamesList.isEmpty();
-        }
-
-        void removeCurrentEntryName() {
-            entryNamesList.remove(0);
-        }
     }
 
 }
