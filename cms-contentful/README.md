@@ -3,26 +3,30 @@ Sunrise Java Contentful CMS
 
 Module for [Sunrise Java](https://github.com/sphereio/commercetools-sunrise-java) with Contentful service. 
 
-### Requirements
+### Content model
 
-Every entry type should have entry text field with id 'name', which needs to be marked as 'Entry title'.
+The best way to use Sunrise Java Contentful CMS is to use it in common with following content model:
+* every page should have it's separate entry (page entry) with only required fields.
+* every page entry should belong to separate wrapper entry.
+Wrapper entry type should contain two fields - one entry field of type 'symbol' (short text)
+for identifying page entry, and one entry field of type 'reference', which points to
+right entry page.
 
 ### How to use it
 
 To implement Contentful data into sunrise project, 
-one need to create ContentfulCmsService object using API token and space id:
+one need to create ContentfulCmsService object using API token, space id 
+along with information about wrapper entry: name of it's type (pageTypeName),
+and id field (pageTypeIdFieldName).
 
-`ContentfulCmsService cmsService = ContentfulCmsService.of("spaceId", "token");`
+`ContentfulCmsService.of("spaceId", "token", "pageTypeName", "pageTypeIdFieldName");`
 
-For retrieving string content use:
-`cmsService.get(localesList, cmsIdentifier);`
+For retrieving content for the whole page use:
+`cmsService.get("pageKey", localesList);`,
+where 'pageKey' is the value of identifying field.
 
-Currently this module doesn't support "Location" entry type. 
-All other entry types are returned as strings.
-
-### Integration
-
-For Contentful CmsIdentifier fields serves as:
-* entryType - it is an id of Contentful entry type.
-* entryKey - it is entry name. Look [here](.#Requirements).
-* fieldName - it is field name, which contains required value or asset.
+Currently this module doesn't support "Location" entry type,
+neither array types(array of text fields, media fields, list of entries).
+Every other values are achievable using `CmsPage` method `Optional<String> get(final String fieldName);` 
+where `fieldName` is a path to correct field.
+E.g. `banner.image.url`. Separated values are ids of succeeding entry fields.
