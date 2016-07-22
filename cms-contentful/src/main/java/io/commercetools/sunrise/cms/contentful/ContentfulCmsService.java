@@ -33,6 +33,7 @@ public class ContentfulCmsService implements CmsService {
         this.client = client;
     }
 
+    
     /**
      * Gets the content corresponding to the given CMS identifier for the first found given language.
      * @param locales the list of locales used to translate the message
