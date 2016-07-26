@@ -1,6 +1,5 @@
 package com.commercetools.sunrise.cms.contentful;
 
-import com.commercetools.sunrise.cms.contentful.models.FieldTypes;
 import com.contentful.java.cda.CDAAsset;
 import com.contentful.java.cda.CDAContentType;
 import com.contentful.java.cda.CDAEntry;
@@ -10,6 +9,7 @@ import org.junit.Test;
 
 import java.util.*;
 
+import static com.commercetools.sunrise.cms.contentful.models.FieldTypes.*;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -54,7 +54,7 @@ public class ContentfulCmsPageTest {
 
     @Test
     public void whenEntryFieldTypeIsText_thenReturnOptionalString() throws Exception {
-        final CDAEntry mockCdaEntry = mockEntry(FIELD_NAME, CONTENT_VALUE, FieldTypes.TEXT);
+        final CDAEntry mockCdaEntry = mockEntry(FIELD_NAME, CONTENT_VALUE, TEXT);
         final ContentfulCmsPage contentfulCmsPage = new ContentfulCmsPage(mockCdaEntry, SUPPORTED_LOCALES);
         final Optional<String> content = contentfulCmsPage.get(FIELD_NAME);
 
@@ -64,7 +64,7 @@ public class ContentfulCmsPageTest {
     @Test
     public void whenEntryFieldTypeIsDate_thenReturnOptionalString() throws Exception {
         final String localizedFieldContent = "2015-11-06T09:45:27";
-        final CDAEntry mockCdaEntry = mockEntry(FIELD_NAME, localizedFieldContent, FieldTypes.DATE);
+        final CDAEntry mockCdaEntry = mockEntry(FIELD_NAME, localizedFieldContent, DATE);
         final ContentfulCmsPage contentfulCmsPage = new ContentfulCmsPage(mockCdaEntry, SUPPORTED_LOCALES);
         final Optional<String> content = contentfulCmsPage.get(FIELD_NAME);
 
@@ -74,7 +74,7 @@ public class ContentfulCmsPageTest {
     @Test
     public void whenEntryFieldTypeIsInteger_thenReturnOptionalString() throws Exception {
         final int localizedFieldContent = 13;
-        final CDAEntry mockCdaEntry = mockEntry(FIELD_NAME, localizedFieldContent, FieldTypes.INTEGER);
+        final CDAEntry mockCdaEntry = mockEntry(FIELD_NAME, localizedFieldContent, INTEGER);
         final ContentfulCmsPage contentfulCmsPage = new ContentfulCmsPage(mockCdaEntry, SUPPORTED_LOCALES);
         final Optional<String> content = contentfulCmsPage.get(FIELD_NAME);
 
@@ -84,7 +84,7 @@ public class ContentfulCmsPageTest {
     @Test
     public void whenEntryFieldTypeIsNumber_thenReturnOptionalString() throws Exception {
         final double localizedFieldContent = 3.14;
-        final CDAEntry mockCdaEntry = mockEntry(FIELD_NAME, localizedFieldContent, FieldTypes.NUMBER);
+        final CDAEntry mockCdaEntry = mockEntry(FIELD_NAME, localizedFieldContent, NUMBER);
         final ContentfulCmsPage contentfulCmsPage = new ContentfulCmsPage(mockCdaEntry, SUPPORTED_LOCALES);
         final Optional<String> content = contentfulCmsPage.get(FIELD_NAME);
 
@@ -94,7 +94,7 @@ public class ContentfulCmsPageTest {
     @Test
     public void whenEntryFieldTypeIsBoolean_thenReturnOptionalString() throws Exception {
         final boolean localizedFieldContent = true;
-        final CDAEntry mockCdaEntry = mockEntry(FIELD_NAME, localizedFieldContent, FieldTypes.BOOLEAN);
+        final CDAEntry mockCdaEntry = mockEntry(FIELD_NAME, localizedFieldContent, BOOLEAN);
         final ContentfulCmsPage contentfulCmsPage = new ContentfulCmsPage(mockCdaEntry, SUPPORTED_LOCALES);
         final Optional<String> content = contentfulCmsPage.get(FIELD_NAME);
 
@@ -106,7 +106,7 @@ public class ContentfulCmsPageTest {
         final String localizedFieldContent = "//some.url";
         final CDAAsset mockAsset = mock(CDAAsset.class);
         when(mockAsset.url()).thenReturn(localizedFieldContent);
-        final CDAEntry mockCdaEntry = mockEntry(FIELD_NAME, mockAsset, FieldTypes.LINK, true);
+        final CDAEntry mockCdaEntry = mockEntry(FIELD_NAME, mockAsset, LINK, true);
         final ContentfulCmsPage contentfulCmsPage = new ContentfulCmsPage(mockCdaEntry, SUPPORTED_LOCALES);
         final Optional<String> content = contentfulCmsPage.get(FIELD_NAME);
 
@@ -118,7 +118,7 @@ public class ContentfulCmsPageTest {
         final String localizedFieldContent = "//some.url";
         final CDAAsset mockAsset = mock(CDAAsset.class);
         when(mockAsset.url()).thenReturn(localizedFieldContent);
-        final CDAEntry mockCdaEntry = mockEntry(FIELD_NAME, mockAsset, FieldTypes.LINK, false);
+        final CDAEntry mockCdaEntry = mockEntry(FIELD_NAME, mockAsset, LINK, false);
         final ContentfulCmsPage contentfulCmsPage = new ContentfulCmsPage(mockCdaEntry, SUPPORTED_LOCALES);
         final Optional<String> content = contentfulCmsPage.get(FIELD_NAME);
 
@@ -130,7 +130,7 @@ public class ContentfulCmsPageTest {
         final String localizedFieldContent = null;
         final CDAAsset mockAsset = mock(CDAAsset.class);
         when(mockAsset.url()).thenReturn(localizedFieldContent);
-        final CDAEntry mockCdaEntry = mockEntry(FIELD_NAME, mockAsset, FieldTypes.LINK, true);
+        final CDAEntry mockCdaEntry = mockEntry(FIELD_NAME, mockAsset, LINK, true);
         final ContentfulCmsPage contentfulCmsPage = new ContentfulCmsPage(mockCdaEntry, SUPPORTED_LOCALES);
         final Optional<String> content = contentfulCmsPage.get(FIELD_NAME);
 
@@ -139,7 +139,7 @@ public class ContentfulCmsPageTest {
 
     private CDAEntry mockEntry(final String fieldName,
                                final String localizedFieldContent) {
-        return mockEntry(fieldName, localizedFieldContent, FieldTypes.SYMBOL, false);
+        return mockEntry(fieldName, localizedFieldContent, SYMBOL, false);
     }
 
     private CDAEntry mockEntry(final String fieldName,
@@ -157,7 +157,7 @@ public class ContentfulCmsPageTest {
         CDAContentType mockContentType = mock(CDAContentType.class);
         when(mockCdaEntry.contentType()).thenReturn(mockContentType);
         when(mockCdaField.type()).thenReturn(fieldType);
-        when(mockCdaField.linkType()).thenReturn(isLinkedAsset ? FieldTypes.LINK_ASSET : "otherLinkedType");
+        when(mockCdaField.linkType()).thenReturn(isLinkedAsset ? LINK_ASSET : "otherLinkedType");
         when(mockCdaField.id()).thenReturn(FIELD_NAME);
         when(mockContentType.fields()).thenReturn(Collections.singletonList(mockCdaField));
 
