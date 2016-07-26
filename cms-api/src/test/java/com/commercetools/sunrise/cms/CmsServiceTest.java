@@ -1,4 +1,4 @@
-package io.commercetools.sunrise.cms;
+package com.commercetools.sunrise.cms;
 
 import com.commercetools.sunrise.cms.CmsService;
 import org.junit.Test;
