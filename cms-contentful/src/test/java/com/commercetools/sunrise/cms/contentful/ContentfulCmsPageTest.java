@@ -32,7 +32,7 @@ public class ContentfulCmsPageTest {
         final Locale deAt = Locale.forLanguageTag("de-AT");
         final List<Locale> supportedLocales = Collections.singletonList(deAt);
         final ContentfulCmsPage contentfulCmsPage= new ContentfulCmsPage(mockCdaEntry, supportedLocales);
-        final Optional<String> content = contentfulCmsPage.get(FIELD_NAME);
+        final Optional<String> content = contentfulCmsPage.field(FIELD_NAME);
 
         assertThat(content).isEmpty();
     }
@@ -40,14 +40,14 @@ public class ContentfulCmsPageTest {
     @Test
     public void whenEntryDoesNotHaveRequiredField_thenReturnOptionalEmpty() throws Exception {
         final String notMatchingFieldName = "notMatchingFieldName";
-        final Optional<String> content = contentfulCmsPage.get(notMatchingFieldName);
+        final Optional<String> content = contentfulCmsPage.field(notMatchingFieldName);
 
         assertThat(content).isEmpty();
     }
 
     @Test
     public void whenEntryExistsInSupportedLanguage_thenReturnIt() throws Exception {
-        final Optional<String> content = contentfulCmsPage.get(FIELD_NAME);
+        final Optional<String> content = contentfulCmsPage.field(FIELD_NAME);
 
         assertThat(content).contains("Content of left top");
     }
@@ -56,7 +56,7 @@ public class ContentfulCmsPageTest {
     public void whenEntryFieldTypeIsText_thenReturnOptionalString() throws Exception {
         final CDAEntry mockCdaEntry = mockEntry(FIELD_NAME, CONTENT_VALUE, TEXT);
         final ContentfulCmsPage contentfulCmsPage = new ContentfulCmsPage(mockCdaEntry, SUPPORTED_LOCALES);
-        final Optional<String> content = contentfulCmsPage.get(FIELD_NAME);
+        final Optional<String> content = contentfulCmsPage.field(FIELD_NAME);
 
         assertThat(content).contains(CONTENT_VALUE);
     }
@@ -66,7 +66,7 @@ public class ContentfulCmsPageTest {
         final String localizedFieldContent = "2015-11-06T09:45:27";
         final CDAEntry mockCdaEntry = mockEntry(FIELD_NAME, localizedFieldContent, DATE);
         final ContentfulCmsPage contentfulCmsPage = new ContentfulCmsPage(mockCdaEntry, SUPPORTED_LOCALES);
-        final Optional<String> content = contentfulCmsPage.get(FIELD_NAME);
+        final Optional<String> content = contentfulCmsPage.field(FIELD_NAME);
 
         assertThat(content).contains(localizedFieldContent);
     }
@@ -76,7 +76,7 @@ public class ContentfulCmsPageTest {
         final int localizedFieldContent = 13;
         final CDAEntry mockCdaEntry = mockEntry(FIELD_NAME, localizedFieldContent, INTEGER);
         final ContentfulCmsPage contentfulCmsPage = new ContentfulCmsPage(mockCdaEntry, SUPPORTED_LOCALES);
-        final Optional<String> content = contentfulCmsPage.get(FIELD_NAME);
+        final Optional<String> content = contentfulCmsPage.field(FIELD_NAME);
 
         assertThat(content).contains(String.valueOf(localizedFieldContent));
     }
@@ -86,7 +86,7 @@ public class ContentfulCmsPageTest {
         final double localizedFieldContent = 3.14;
         final CDAEntry mockCdaEntry = mockEntry(FIELD_NAME, localizedFieldContent, NUMBER);
         final ContentfulCmsPage contentfulCmsPage = new ContentfulCmsPage(mockCdaEntry, SUPPORTED_LOCALES);
-        final Optional<String> content = contentfulCmsPage.get(FIELD_NAME);
+        final Optional<String> content = contentfulCmsPage.field(FIELD_NAME);
 
         assertThat(content).contains(String.valueOf(localizedFieldContent));
     }
@@ -96,7 +96,7 @@ public class ContentfulCmsPageTest {
         final boolean localizedFieldContent = true;
         final CDAEntry mockCdaEntry = mockEntry(FIELD_NAME, localizedFieldContent, BOOLEAN);
         final ContentfulCmsPage contentfulCmsPage = new ContentfulCmsPage(mockCdaEntry, SUPPORTED_LOCALES);
-        final Optional<String> content = contentfulCmsPage.get(FIELD_NAME);
+        final Optional<String> content = contentfulCmsPage.field(FIELD_NAME);
 
         assertThat(content).contains(String.valueOf(localizedFieldContent));
     }
@@ -108,7 +108,7 @@ public class ContentfulCmsPageTest {
         when(mockAsset.url()).thenReturn(localizedFieldContent);
         final CDAEntry mockCdaEntry = mockEntry(FIELD_NAME, mockAsset, LINK, true);
         final ContentfulCmsPage contentfulCmsPage = new ContentfulCmsPage(mockCdaEntry, SUPPORTED_LOCALES);
-        final Optional<String> content = contentfulCmsPage.get(FIELD_NAME);
+        final Optional<String> content = contentfulCmsPage.field(FIELD_NAME);
 
         assertThat(content).contains(localizedFieldContent);
     }
@@ -120,7 +120,7 @@ public class ContentfulCmsPageTest {
         when(mockAsset.url()).thenReturn(localizedFieldContent);
         final CDAEntry mockCdaEntry = mockEntry(FIELD_NAME, mockAsset, LINK, false);
         final ContentfulCmsPage contentfulCmsPage = new ContentfulCmsPage(mockCdaEntry, SUPPORTED_LOCALES);
-        final Optional<String> content = contentfulCmsPage.get(FIELD_NAME);
+        final Optional<String> content = contentfulCmsPage.field(FIELD_NAME);
 
         assertThat(content).isEmpty();
     }
@@ -132,7 +132,7 @@ public class ContentfulCmsPageTest {
         when(mockAsset.url()).thenReturn(localizedFieldContent);
         final CDAEntry mockCdaEntry = mockEntry(FIELD_NAME, mockAsset, LINK, true);
         final ContentfulCmsPage contentfulCmsPage = new ContentfulCmsPage(mockCdaEntry, SUPPORTED_LOCALES);
-        final Optional<String> content = contentfulCmsPage.get(FIELD_NAME);
+        final Optional<String> content = contentfulCmsPage.field(FIELD_NAME);
 
         assertThat(content).isEmpty();
     }

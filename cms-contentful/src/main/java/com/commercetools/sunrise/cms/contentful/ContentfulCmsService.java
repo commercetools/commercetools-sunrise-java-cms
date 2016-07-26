@@ -44,7 +44,7 @@ public class ContentfulCmsService implements CmsService {
      * when obtaining the content from Contentful.
      */
     @Override
-    public CompletionStage<Optional<CmsPage>> get(final String pageKey, final List<Locale> locales) {
+    public CompletionStage<Optional<CmsPage>> page(final String pageKey, final List<Locale> locales) {
         return getEntry(pageKey)
                 .thenApply(cdaEntryOptional -> cdaEntryOptional
                         .map(cdaEntry ->

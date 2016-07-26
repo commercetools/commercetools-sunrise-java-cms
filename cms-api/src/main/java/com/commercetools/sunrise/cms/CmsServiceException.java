@@ -1,10 +1,8 @@
 package com.commercetools.sunrise.cms;
 
 /**
- * An unchecked exception signalling that there was a problem
- * when obtaining the content from the CMS.
- * It could be caused by wrong call parameters (eg. wrong credentials)
- * or server side issues.
+ * An unchecked exception signalling that there was a problem when obtaining the content from the CMS.
+ * It could be caused by wrong call parameters (eg. wrong credentials) or server side issues.
  * <p>
  * Exceptions of this type will often wrap a lower-level exception.
  *

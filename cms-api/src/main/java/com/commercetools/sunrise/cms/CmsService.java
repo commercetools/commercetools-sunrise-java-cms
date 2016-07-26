@@ -17,6 +17,6 @@ public interface CmsService {
      * @param locales for the localized content inside the page
      * @return a {@code CompletionStage} containing the page content identified by the key
      */
-    CompletionStage<Optional<CmsPage>> get(final String pageKey, final List<Locale> locales);
+    CompletionStage<Optional<CmsPage>> page(final String pageKey, final List<Locale> locales);
 
 }

@@ -22,11 +22,11 @@ and id field (pageTypeIdFieldName).
 `ContentfulCmsService.of("spaceId", "token", "pageTypeName", "pageTypeIdFieldName");`
 
 For retrieving content for the whole page use:
-`cmsService.get("pageKey", localesList);`,
+`cmsService.page("pageKey", localesList);`,
 where 'pageKey' is the value of identifying field.
 
 Currently this module doesn't support "Location" entry type,
 neither array types(array of text fields, media fields, list of entries).
-Every other values are achievable using `CmsPage` method `Optional<String> get(final String fieldName);` 
+Every other values are achievable using `CmsPage` method `Optional<String> field(final String fieldName);` 
 where `fieldName` is a path to correct field.
 E.g. `banner.image.url`. Separated values are ids of succeeding entry fields.

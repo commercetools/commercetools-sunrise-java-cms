@@ -45,7 +45,7 @@ public class ContentfulCmsServiceIT {
     public void whenCouldNotFetchEntry_thenThrowException() throws Exception {
         final ContentfulCmsService cmsService = ContentfulCmsService.of("", "", PAGE_TYPE_NAME, PAGE_TYPE_ID_FIELD_NAME);
 
-        Throwable thrown = catchThrowable(() -> waitAndGet(cmsService.get("home", SUPPORTED_LOCALES)));
+        Throwable thrown = catchThrowable(() -> waitAndGet(cmsService.page("home", SUPPORTED_LOCALES)));
 
         assertThat(thrown).isInstanceOf(ExecutionException.class).hasMessageContaining("Could not fetch content for home");
         assertThat(thrown).hasCauseInstanceOf(CmsServiceException.class);
@@ -53,31 +53,31 @@ public class ContentfulCmsServiceIT {
 
     @Test
     public void whenAskForExistingStringContentThenGet() throws Exception {
-        Optional<CmsPage> content = waitAndGet(contentfulCmsService.get("finn", SUPPORTED_LOCALES));
+        Optional<CmsPage> content = waitAndGet(contentfulCmsService.page("finn", SUPPORTED_LOCALES));
         assertThat(content).isPresent();
 
-        assertThat(content.get().get("pageContent.description")).contains("Fearless adventurer! Defender of pancakes.");
+        assertThat(content.get().field("pageContent.description")).contains("Fearless adventurer! Defender of pancakes.");
     }
 
     @Test
     public void whenAskForNotExistingStringContentThenNotPresent() throws Exception {
-        Optional<CmsPage> content = waitAndGet(contentfulCmsService.get("finn", SUPPORTED_LOCALES));
+        Optional<CmsPage> content = waitAndGet(contentfulCmsService.page("finn", SUPPORTED_LOCALES));
         assertThat(content).isPresent();
-        assertThat(content.get().get("pageContent.notExistingField")).isEmpty();
+        assertThat(content.get().field("pageContent.notExistingField")).isEmpty();
     }
 
     @Test
     public void whenAskForExistingAssetContentThenGet() throws Exception {
-        Optional<CmsPage> content = waitAndGet(contentfulCmsService.get("jacke", SUPPORTED_LOCALES));
+        Optional<CmsPage> content = waitAndGet(contentfulCmsService.page("jacke", SUPPORTED_LOCALES));
         assertThat(content).isPresent();
-        assertThat(content.get().getOrEmpty("pageContent.image")).isEqualToIgnoringCase("//images.contentful.com/l6chdlzlf8jn/2iVeCh1FGoy00Oq8WEI2aI/93c3f0841fcf59743f57e238f6ed67aa/jake.png");
+        assertThat(content.get().fieldOrEmpty("pageContent.image")).isEqualToIgnoringCase("//images.contentful.com/l6chdlzlf8jn/2iVeCh1FGoy00Oq8WEI2aI/93c3f0841fcf59743f57e238f6ed67aa/jake.png");
     }
 
     @Test
     public void whenAskForNotExistingAssetContentThenNotPresent() throws Exception {
-        Optional<CmsPage> content = waitAndGet(contentfulCmsService.get("jacke", SUPPORTED_LOCALES));
+        Optional<CmsPage> content = waitAndGet(contentfulCmsService.page("jacke", SUPPORTED_LOCALES));
         assertThat(content).isPresent();
-        assertThat(content.get().getOrEmpty("pageContent.notExistingAsset")).isEmpty();
+        assertThat(content.get().fieldOrEmpty("pageContent.notExistingAsset")).isEmpty();
 
     }
 

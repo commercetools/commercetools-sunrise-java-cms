@@ -23,7 +23,7 @@ public class ContentfulCmsPage implements CmsPage {
     }
 
     @Override
-    public Optional<String> get(final String fieldName) {
+    public Optional<String> field(final String fieldName) {
         if (StringUtils.isEmpty(fieldName)) {
             return Optional.empty();
         }
