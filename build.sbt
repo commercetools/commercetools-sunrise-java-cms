@@ -3,17 +3,17 @@ import sbt.Keys._
 
 name := "commercetools-sunrise-cms"
 
-organization := "io.commercetools.sunrise"
+organization := "com.commercetools.sunrise.cms"
 
 /**
  * PROJECT DEFINITIONS
  */
 
 lazy val `commercetools-sunrise-cms` = (project in file("."))
-  .aggregate(`cms-common`, `cms-contentful`)
+  .aggregate(`cms-api`, `cms-contentful`)
   .settings(javaUnidocSettings ++ commonSettings : _*)
 
-lazy val `cms-common` = project
+lazy val `cms-api` = project
   .configs(IntegrationTest)
   .settings(commonSettings ++ commonTestSettings : _*)
   .settings(
@@ -26,7 +26,7 @@ lazy val `cms-common` = project
 //lazy val `cms-file-based` = project
 //  .configs(IntegrationTest)
 //  .settings(commonSettings ++ commonTestSettings : _*)
-//  .dependsOn(`cms-common`)
+//  .dependsOn(`cms-api`)
 
 lazy val `cms-contentful` = project
   .configs(IntegrationTest)
@@ -38,7 +38,7 @@ lazy val `cms-contentful` = project
       "com.contentful.java" % "java-sdk" % "7.0.1"
     )
   )
-  .dependsOn(`cms-common`)
+  .dependsOn(`cms-api`)
 
 
 /**
