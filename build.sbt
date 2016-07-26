@@ -3,7 +3,7 @@ import sbt.Keys._
 
 name := "commercetools-sunrise-cms"
 
-organization := "com.commercetools.sunrise.cms"
+organization in ThisBuild := "com.commercetools.sunrise.cms"
 
 /**
  * PROJECT DEFINITIONS
@@ -45,7 +45,7 @@ lazy val `cms-contentful` = project
  * COMMON SETTINGS
  */
 
-lazy val commonSettings = Seq (
+lazy val commonSettings = Release.publishSettings ++ Seq (
   autoScalaLibrary := false,//this is a pure Java module, no Scala dependency
   crossPaths := false,//this is a pure Java module, no Scala version suffix on JARs
   javacOptions in (Compile, doc) := Seq("-quiet", "-notimestamp"),
@@ -74,3 +74,19 @@ def configCommonTestSettings(scopes: String) = Seq(
     "org.mockito" % "mockito-all" % "1.10.19" % scopes
   )
 )
+
+/**
+  * RELEASE SETTINGS
+  */
+
+publishMavenStyle in ThisBuild := true
+
+publishArtifact in Test in ThisBuild := false
+
+publishTo in ThisBuild <<= version { (v: String) =>
+  val nexus = "https://oss.sonatype.org/"
+  if (v.trim.endsWith("SNAPSHOT"))
+    Some("snapshots" at nexus + "content/repositories/snapshots")
+  else
+    Some("releases" at nexus + "service/local/staging/deploy/maven2")
+}
