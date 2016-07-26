@@ -45,8 +45,9 @@ lazy val `cms-contentful` = project
  * COMMON SETTINGS
  */
 
-lazy val commonSettings = releaseSettings ++ Seq (
-  scalaVersion := "2.11.8",
+lazy val commonSettings = Seq (
+  autoScalaLibrary := false,//this is a pure Java module, no Scala dependency
+  crossPaths := false,//this is a pure Java module, no Scala version suffix on JARs
   javacOptions in (Compile, doc) := Seq("-quiet", "-notimestamp"),
   javacOptions ++= Seq("-source", "1.8", "-target", "1.8")
 )
@@ -62,7 +63,6 @@ lazy val itBaseTestSettings = Defaults.itSettings ++ configTestDirs(IntegrationT
 
 def configTestDirs(config: Configuration, folderName: String) = Seq(
   javaSource in config := baseDirectory.value / folderName,
-  scalaSource in config := baseDirectory.value / folderName,
   resourceDirectory in config := baseDirectory.value / s"$folderName/resources"
 )
 
@@ -72,23 +72,5 @@ def configCommonTestSettings(scopes: String) = Seq(
     "com.novocode" % "junit-interface" % "0.11" % scopes,
     "org.assertj" % "assertj-core" % "3.4.1" % scopes,
     "org.mockito" % "mockito-all" % "1.10.19" % scopes
-  )
-)
-
-/**
- * RELEASE SETTINGS
- */
-
-lazy val releaseSettings = Seq(
-  releaseProcess := Seq[ReleaseStep](
-    checkSnapshotDependencies,
-    inquireVersions,
-    runTest,
-    setReleaseVersion,
-    commitReleaseVersion,
-    tagRelease,
-    setNextVersion,
-    commitNextVersion,
-    pushChanges
   )
 )
