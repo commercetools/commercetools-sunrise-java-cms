@@ -35,7 +35,7 @@ object Release {
         <developers>
           <developer>
             <id>dariuszor</id>
-            <name>dariuszor</name>
+            <name>Dariusz Orlowski</name>
             <url>https://github.com/dariuszor</url>
           </developer>
           <developer>
