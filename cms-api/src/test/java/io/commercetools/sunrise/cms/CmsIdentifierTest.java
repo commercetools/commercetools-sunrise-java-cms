@@ -1,5 +1,6 @@
 package io.commercetools.sunrise.cms;
 
+import com.commercetools.sunrise.cms.CmsIdentifier;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

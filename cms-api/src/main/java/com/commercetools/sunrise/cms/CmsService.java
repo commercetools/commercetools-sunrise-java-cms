@@ -1,4 +1,4 @@
-package io.commercetools.sunrise.cms;
+package com.commercetools.sunrise.cms;
 
 import java.util.List;
 import java.util.Locale;

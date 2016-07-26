@@ -4,8 +4,8 @@ import com.contentful.java.cda.CDAArray;
 import com.contentful.java.cda.CDAAsset;
 import com.contentful.java.cda.CDAClient;
 import com.contentful.java.cda.CDAEntry;
-import io.commercetools.sunrise.cms.CmsIdentifier;
-import io.commercetools.sunrise.cms.CmsService;
+import com.commercetools.sunrise.cms.CmsIdentifier;
+import com.commercetools.sunrise.cms.CmsService;
 
 import javax.annotation.Nullable;
 import java.util.List;

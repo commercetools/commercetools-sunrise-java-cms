@@ -1,5 +1,6 @@
 package io.commercetools.sunrise.cms;
 
+import com.commercetools.sunrise.cms.CmsService;
 import org.junit.Test;
 
 import java.util.Optional;

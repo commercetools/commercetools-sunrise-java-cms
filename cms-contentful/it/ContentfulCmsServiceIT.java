@@ -1,4 +1,4 @@
-import io.commercetools.sunrise.cms.CmsIdentifier;
+import com.commercetools.sunrise.cms.CmsIdentifier;
 import io.commercetools.sunrise.cms.contentful.ContentfulCmsService;
 import org.junit.Before;
 import org.junit.Test;
