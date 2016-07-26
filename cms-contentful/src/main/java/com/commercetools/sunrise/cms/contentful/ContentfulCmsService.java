@@ -1,4 +1,4 @@
-package io.commercetools.sunrise.cms.contentful;
+package com.commercetools.sunrise.cms.contentful;
 
 import com.contentful.java.cda.CDAArray;
 import com.contentful.java.cda.CDAAsset;

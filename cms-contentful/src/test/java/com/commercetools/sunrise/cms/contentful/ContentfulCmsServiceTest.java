@@ -1,5 +1,6 @@
-package io.commercetools.sunrise.cms.contentful;
+package com.commercetools.sunrise.cms.contentful;
 
+import com.commercetools.sunrise.cms.contentful.ContentfulCmsService;
 import com.contentful.java.cda.CDAClient;
 import com.contentful.java.cda.CDAContentType;
 import com.contentful.java.cda.CDAEntry;
