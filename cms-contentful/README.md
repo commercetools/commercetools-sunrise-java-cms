@@ -1,9 +1,11 @@
 Sunrise Java Contentful CMS
 ===========================
 
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.commercetools.sunrise.cms/cms-api/badge.svg)](http://search.maven.org/#search|gav|1|g:"com.commercetools.sunrise.cms"%20AND%20a:"cms-contentful")
+
 Module for [Sunrise Java](https://github.com/sphereio/commercetools-sunrise-java) with Contentful service. 
 
-### Content model
+## Content model
 
 The best way to use Sunrise Java Contentful CMS is to use it in common with following content model:
 * every page should have it's separate entry (page entry) with only required fields.
@@ -12,7 +14,13 @@ Wrapper entry type should contain two fields - one entry field of type 'symbol' 
 for identifying page entry, and one entry field of type 'reference', which points to
 right entry page.
 
-### How to use it
+## Installation
+If you are using a Sunrise-based project, just add the following dependency:
+```
+libraryDependencies += "com.commercetools.sunrise.cms" % "cms-contentful" % "0.1.0"
+```
+
+## How to use it
 
 To implement Contentful data into sunrise project, 
 one need to create ContentfulCmsService object using API token, space id 
