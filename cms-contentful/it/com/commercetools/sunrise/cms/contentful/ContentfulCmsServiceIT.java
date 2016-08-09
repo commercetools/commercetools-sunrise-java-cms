@@ -5,6 +5,7 @@ import com.commercetools.sunrise.cms.CmsServiceException;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -13,12 +14,11 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.ThrowableAssert.catchThrowable;
 
 public class ContentfulCmsServiceIT {
-    private static final List<Locale> SUPPORTED_LOCALES = asList(Locale.GERMANY, Locale.US);
+    private static final List<Locale> SUPPORTED_LOCALES = Collections.singletonList(Locale.GERMANY);
 
     // credentials for contentful demo account
     private static final String IT_PREFIX = "CONTENTFUL_";
@@ -56,7 +56,37 @@ public class ContentfulCmsServiceIT {
         Optional<CmsPage> content = waitAndGet(contentfulCmsService.page("finn", SUPPORTED_LOCALES));
         assertThat(content).isPresent();
 
+        assertThat(content.get().field("pageContent.description")).contains("Fearless Abenteurer! Verteidiger von Pfannkuchen.");
+    }
+
+    @Test
+    public void whenAskForExistingStringContentAndLocalesAreEmptyThenGetDefaultLocaleContent() throws Exception {
+        Optional<CmsPage> content = waitAndGet(contentfulCmsService.page("finn", Collections.emptyList()));
+        assertThat(content).isPresent();
+
+        assertThat(content.get().field("pageContent.description")).contains("Fearless Abenteurer! Verteidiger von Pfannkuchen.");
+    }
+
+    @Test
+    public void whenAskForExistingStringContentAndLocalesAreNullThenGetDefaultLocaleContent() throws Exception {
+        Optional<CmsPage> content = waitAndGet(contentfulCmsService.page("finn", null));
+        assertThat(content).isPresent();
+
+        assertThat(content.get().field("pageContent.description")).contains("Fearless Abenteurer! Verteidiger von Pfannkuchen.");
+    }
+
+    @Test
+    public void whenAskForExistingStringContentWithNotDefaultLocaleThenGet() throws Exception {
+        Optional<CmsPage> content = waitAndGet(contentfulCmsService.page("finn", Collections.singletonList(Locale.ENGLISH)));
+        assertThat(content).isPresent();
+
         assertThat(content.get().field("pageContent.description")).contains("Fearless adventurer! Defender of pancakes.");
+    }
+
+    @Test
+    public void whenAskForExistingStringContentWithNotDefinedLocaleThenNotPresent() throws Exception {
+        Optional<CmsPage> content = waitAndGet(contentfulCmsService.page("finn", Collections.singletonList(Locale.ITALIAN)));
+        assertThat(content).isEmpty();
     }
 
     @Test
