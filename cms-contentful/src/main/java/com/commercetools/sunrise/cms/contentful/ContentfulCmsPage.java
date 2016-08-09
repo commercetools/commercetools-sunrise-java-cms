@@ -44,12 +44,10 @@ public class ContentfulCmsPage implements CmsPage {
 
     private Optional<String> getContent(final CDAEntry entry, final String contentFieldName) {
         return getCdaField(entry, contentFieldName)
-                .flatMap(cdaField -> getFirstSupportedLocale(entry, contentFieldName)
-                        .flatMap(supportedLocale -> {
-                            final Object localizedEntryField = getLocalizedEntryField(supportedLocale, entry,
-                                    contentFieldName);
-                            return getContentAccordingToFieldDefinition(localizedEntryField, cdaField);
-                        }));
+                .flatMap(cdaField -> {
+                    final Object entryField = entry.getField(contentFieldName);
+                    return getContentAccordingToFieldDefinition(entryField, cdaField);
+                        });
     }
 
     private CDAEntry getEntryWithContentField(@Nullable final CDAEntry cdaEntry, final List<String> entryNamesList) {
@@ -76,22 +74,6 @@ public class ContentfulCmsPage implements CmsPage {
                         && FieldTypes.ALL_SUPPORTED.contains(cdaField.type()))
                 .findFirst();
     }
-    
-    private Object getLocalizedEntryField(final Locale locale, final CDAEntry lastLevelEntry, final String fieldName) {
-        lastLevelEntry.setLocale(locale.toLanguageTag());
-        return lastLevelEntry.getField(fieldName);
-    }
-
-    private Optional<Locale> getFirstSupportedLocale(final CDAEntry lastLevelEntry, final String fieldName) {
-        final Map<String, Object> rawFields = lastLevelEntry.rawFields();
-        final Map<String, Object> localeContentMap = getLocaleContentMap(fieldName, rawFields);
-        return Optional.ofNullable(localeContentMap).flatMap(map -> {
-            final Set<String> allSupportedLocales = map.keySet();
-            return locales.stream()
-                    .filter(locale -> allSupportedLocales.contains(locale.toLanguageTag()))
-                    .findFirst();
-        });
-    }
 
     private Optional<String> getContentAccordingToFieldDefinition(@Nullable final Object localizedEntryField,
                                                                   final CDAField cdaField) {
@@ -105,11 +87,6 @@ public class ContentfulCmsPage implements CmsPage {
                     }
                     return content;
                 });
-    }
-
-    @SuppressWarnings("unchecked")
-    private Map<String, Object> getLocaleContentMap(String fieldName, Map<String, Object> rawFields) {
-        return (Map<String, Object>) rawFields.get(fieldName);
     }
 
 }
