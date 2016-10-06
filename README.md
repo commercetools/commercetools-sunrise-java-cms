@@ -10,7 +10,7 @@ Module for [Sunrise Java](https://github.com/sphereio/commercetools-sunrise-java
 ##Installation
 Choose the CMS Service you want to use and follow its installation details:
 
-- [Contentful](/cms-contentful)
+- [Contentful Sunrise Adapter](/cms-contentful)
 
 Note that if you are not using a Sunrise-based project, you'll additionally need to use as dependency:
 ```
