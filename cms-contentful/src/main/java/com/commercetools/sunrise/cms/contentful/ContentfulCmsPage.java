@@ -7,9 +7,9 @@ import com.contentful.java.cda.CDAEntry;
 import com.contentful.java.cda.CDAField;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.annotation.Nullable;
 import java.util.*;
 
+import static java.util.Arrays.copyOfRange;
 import static org.apache.commons.lang3.StringUtils.split;
 
 public class ContentfulCmsPage implements CmsPage {
@@ -17,76 +17,87 @@ public class ContentfulCmsPage implements CmsPage {
     private CDAEntry cdaEntry;
     private List<Locale> locales;
 
-    public ContentfulCmsPage(CDAEntry cdaEntry, List<Locale> locales) {
+    public ContentfulCmsPage(final CDAEntry cdaEntry, final List<Locale> locales) {
         this.cdaEntry = cdaEntry;
         this.locales = locales;
     }
 
     @Override
-    public Optional<String> field(final String fieldName) {
-        if (StringUtils.isEmpty(fieldName)) {
+    public Optional<String> field(final String path) {
+        if (StringUtils.isEmpty(path)) {
             return Optional.empty();
         }
-        final List<String> allNames = new ArrayList<>(Arrays.asList(split(fieldName, ".")));
-        return Optional.ofNullable(getEntryWithContentField(cdaEntry, getEntryNamesList(allNames)))
-                .flatMap(entryWithContentField ->
-                        getContent(entryWithContentField, getContentFieldName(allNames)));
+
+        final String[] pathSegments = split(path, ".");
+        final String fieldKey = pathSegments[pathSegments.length - 1];
+        final String[] entryPathSegments = createEntryPathSegments(pathSegments);
+        return findEntry(entryPathSegments).flatMap(lastEntry ->
+                findContent(lastEntry, fieldKey));
     }
 
-    private String getContentFieldName(List<String> allNames) {
-        return allNames.size() > 1 ? allNames.get(allNames.size() - 1) : allNames.get(0);
+    /**
+     * Skip last segment which is expected to be a field name.
+     *
+     * @param pathSegments entire path segments
+     * @return path segments of entries only
+     */
+    private String[] createEntryPathSegments(final String[] pathSegments) {
+        return copyOfRange(pathSegments, 0, pathSegments.length - 1);
     }
 
-    private List<String> getEntryNamesList(List<String> allNames) {
-        return allNames.size() > 1 ?
-                allNames.subList(0, allNames.size() - 1) : Collections.emptyList();
-    }
-
-    private Optional<String> getContent(final CDAEntry entry, final String contentFieldName) {
-        return getCdaField(entry, contentFieldName)
-                .flatMap(cdaField -> {
-                    final Object entryField = entry.getField(contentFieldName);
-                    return getContentAccordingToFieldDefinition(entryField, cdaField);
-                        });
-    }
-
-    private CDAEntry getEntryWithContentField(@Nullable final CDAEntry cdaEntry, final List<String> entryNamesList) {
-        if (entryNamesList.isEmpty()) {
-            return cdaEntry;
-        } else {
-            final String key = entryNamesList.get(0);
-            if (cdaEntry != null && cdaEntry.rawFields().containsKey(key)) {
-                Object item = cdaEntry.getField(key);
-                if (item instanceof CDAEntry) {
-                    entryNamesList.remove(0);
-                    return getEntryWithContentField((CDAEntry) item, entryNamesList);
+    /**
+     * Traverse contained CDAEntry to match all path segments.
+     *
+     * @param pathSegments array of all path segments that lead to CDAEntry of interest
+     * @return CDAEntry that matches path segments
+     */
+    private Optional<CDAEntry> findEntry(final String[] pathSegments) {
+        CDAEntry entry = cdaEntry;
+        for (String key: pathSegments) {
+            if (entry.rawFields().containsKey(key)) {
+                Object field = entry.getField(key);
+                if (field instanceof CDAEntry) {
+                    entry = (CDAEntry) field;
+                } else {
+                    return Optional.empty();
                 }
+            } else {
+                return Optional.empty();
             }
-            return null;
         }
+        return Optional.of(entry);
     }
 
-    // CDAField contains information related to field, like it's type
-    private Optional<CDAField> getCdaField(final CDAEntry lastLevelEntry, final String fieldName) {
-        return lastLevelEntry.contentType().fields()
-                .stream()
-                .filter(cdaField -> cdaField.id().equals(fieldName)
-                        && FieldTypes.ALL_SUPPORTED.contains(cdaField.type()))
-                .findFirst();
+    private Optional<String> findContent(final CDAEntry entry, final String fieldKey) {
+        return getField(entry, fieldKey).flatMap(field ->
+                findContentTypeField(entry, fieldKey).flatMap(contentTypeField ->
+                        getContentBasedOnType(field, contentTypeField)));
     }
 
-    private Optional<String> getContentAccordingToFieldDefinition(@Nullable final Object localizedEntryField,
-                                                                  final CDAField cdaField) {
-        return Optional.ofNullable(localizedEntryField)
-                .map(entryField -> {
-                    String content = null;
-                    if (FieldTypes.CONVERTABLE_TO_STRING.contains(cdaField.type())) {
-                        content = String.valueOf(entryField);
-                    } else if (cdaField.linkType().equals(FieldTypes.LINK_ASSET)) {
-                        content = ((CDAAsset) entryField).url();
-                    }
-                    return content;
-                });
+    private Optional<Object> getField(final CDAEntry entry, final String fieldKey) {
+        return Optional.ofNullable(entry.getField(fieldKey));
+    }
+
+    private Optional<CDAField> findContentTypeField(final CDAEntry entry, final String fieldKey) {
+        return entry.contentType().fields().stream()
+                .filter(field -> field.id().equals(fieldKey) && FieldTypes.ALL_SUPPORTED.contains(field.type()))
+                .findAny();
+    }
+
+    /**
+     * Convert content of the field to String if possible.
+     *
+     * @param entryField object to convert to string
+     * @param contentTypeField information about object's type
+     * @return content of the field in String representation if possible
+     */
+    private Optional<String> getContentBasedOnType(final Object entryField, final CDAField contentTypeField) {
+        if (FieldTypes.CONVERTABLE_TO_STRING.contains(contentTypeField.type())) {
+            return Optional.of(String.valueOf(entryField));
+        } else if (FieldTypes.LINK_ASSET.equals(contentTypeField.linkType())) {
+            return Optional.ofNullable(((CDAAsset) entryField).url());
+        }
+        return Optional.empty();
     }
 
 }
