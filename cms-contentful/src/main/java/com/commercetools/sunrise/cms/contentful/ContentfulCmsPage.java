@@ -8,11 +8,15 @@ import com.contentful.java.cda.CDAField;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static java.util.Arrays.copyOfRange;
 import static org.apache.commons.lang3.StringUtils.split;
 
 public class ContentfulCmsPage implements CmsPage {
+
+    private static final Pattern ARRAY_KEY_PATTERN = Pattern.compile("(.+)\\[(\\d+)\\]$");
 
     private CDAEntry cdaEntry;
     private List<Locale> locales;
@@ -53,19 +57,41 @@ public class ContentfulCmsPage implements CmsPage {
      */
     private Optional<CDAEntry> findEntry(final String[] pathSegments) {
         CDAEntry entry = cdaEntry;
+
         for (String key: pathSegments) {
-            if (entry.rawFields().containsKey(key)) {
-                Object field = entry.getField(key);
-                if (field instanceof CDAEntry) {
-                    entry = (CDAEntry) field;
-                } else {
-                    return Optional.empty();
-                }
+            Object nextEntry = null;
+
+            Matcher arrayMatcher = ARRAY_KEY_PATTERN.matcher(key);
+
+            if (arrayMatcher.find()) {
+                String arrayKey = arrayMatcher.group(1);
+                int index = Integer.parseInt(arrayMatcher.group(2));
+                nextEntry = getEntryFromArray(entry, arrayKey, index);
+            } else if (entry.rawFields().containsKey(key)) {
+                nextEntry = entry.getField(key);
+            }
+
+            if (nextEntry != null && nextEntry instanceof CDAEntry) {
+                entry = (CDAEntry) nextEntry;
             } else {
                 return Optional.empty();
             }
         }
+
         return Optional.of(entry);
+    }
+
+    private Object getEntryFromArray(CDAEntry parentEntry, String arrayFieldKey, int index) {
+        if (parentEntry.rawFields().containsKey(arrayFieldKey)) {
+            Object field = parentEntry.getField(arrayFieldKey);
+            if (field instanceof ArrayList) {
+                ArrayList arrayList = (ArrayList) field;
+                if (index < arrayList.size()) {
+                    return arrayList.get(index);
+                }
+            }
+        }
+        return null;
     }
 
     private Optional<String> findContent(final CDAEntry entry, final String fieldKey) {
