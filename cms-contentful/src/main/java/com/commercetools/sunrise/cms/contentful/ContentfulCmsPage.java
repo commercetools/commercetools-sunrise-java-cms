@@ -1,7 +1,6 @@
 package com.commercetools.sunrise.cms.contentful;
 
 import com.commercetools.sunrise.cms.CmsPage;
-import com.commercetools.sunrise.cms.contentful.models.FieldTypes;
 import com.contentful.java.cda.CDAAsset;
 import com.contentful.java.cda.CDAEntry;
 import com.contentful.java.cda.CDAField;
@@ -11,6 +10,9 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.commercetools.sunrise.cms.contentful.models.FieldType.hasStringRepresentation;
+import static com.commercetools.sunrise.cms.contentful.models.FieldType.isAsset;
+import static com.commercetools.sunrise.cms.contentful.models.FieldType.isSupported;
 import static java.util.Arrays.copyOfRange;
 import static org.apache.commons.lang3.StringUtils.split;
 
@@ -40,7 +42,7 @@ public class ContentfulCmsPage implements CmsPage {
     }
 
     /**
-     * Skip last segment which is expected to be a field name.
+     * Form an array with last segment skipped which is expected to be a field name.
      *
      * @param pathSegments entire path segments
      * @return path segments of entries only
@@ -64,9 +66,7 @@ public class ContentfulCmsPage implements CmsPage {
             Matcher arrayMatcher = ARRAY_KEY_PATTERN.matcher(key);
 
             if (arrayMatcher.find()) {
-                String arrayKey = arrayMatcher.group(1);
-                int index = Integer.parseInt(arrayMatcher.group(2));
-                nextEntry = getEntryFromArray(entry, arrayKey, index);
+                nextEntry = getEntryFromArray(entry, arrayMatcher);
             } else if (entry.rawFields().containsKey(key)) {
                 nextEntry = entry.getField(key);
             }
@@ -81,9 +81,26 @@ public class ContentfulCmsPage implements CmsPage {
         return Optional.of(entry);
     }
 
-    private Object getEntryFromArray(CDAEntry parentEntry, String arrayFieldKey, int index) {
-        if (parentEntry.rawFields().containsKey(arrayFieldKey)) {
-            Object field = parentEntry.getField(arrayFieldKey);
+    /**
+     * Try to get an item from input entry which is supposed to contain an array of fields.
+     *
+     * After pattern has been matched arrayMatcher contains a regexp group of key and index.
+     * E.g. after matching 'key[1]' two groups of 'key' and '1' are contained in matcher.
+     *
+     * They are later used to find 'key' field in parentEntry and retrieve '1' (second)
+     * item from that field which is expected to form an array list.
+     *
+     * If the process fails null is returned.
+     *
+     * @param parentEntry should contain expected array field
+     * @param arrayMatcher contains key and index groups after pattern has been matched
+     * @return matched entry or null
+     */
+    private Object getEntryFromArray(final CDAEntry parentEntry, final Matcher arrayMatcher) {
+        String arrayEntryKey = arrayMatcher.group(1);
+        int index = Integer.parseInt(arrayMatcher.group(2));
+        if (parentEntry.rawFields().containsKey(arrayEntryKey)) {
+            Object field = parentEntry.getField(arrayEntryKey);
             if (field instanceof ArrayList) {
                 ArrayList arrayList = (ArrayList) field;
                 if (index < arrayList.size()) {
@@ -94,34 +111,83 @@ public class ContentfulCmsPage implements CmsPage {
         return null;
     }
 
+    /**
+     * Extract field from an entry and convert it its string representation.
+     *
+     * @param entry should contain expected field
+     * @param fieldKey id of field to be search inside entry
+     * @return string representation of the field
+     */
     private Optional<String> findContent(final CDAEntry entry, final String fieldKey) {
+        Matcher arrayMatcher = ARRAY_KEY_PATTERN.matcher(fieldKey);
+        if (arrayMatcher.find()) {
+            String arrayFieldKey = arrayMatcher.group(1);
+            return getFieldFromArray(entry, arrayMatcher).flatMap(field ->
+                    getContent(entry, arrayFieldKey, field));
+        }
         return getField(entry, fieldKey).flatMap(field ->
-                findContentTypeField(entry, fieldKey).flatMap(contentTypeField ->
-                        getContentBasedOnType(field, contentTypeField)));
+                getContent(entry, fieldKey, field));
+    }
+
+    /**
+     * Try to get a field from input entry which is supposed to contain an array of fields.
+     *
+     * After pattern has been matched arrayMatcher contains a regexp group of key and index.
+     * E.g. after matching 'key[1]' two groups of 'key' and '1' are contained in matcher.
+     *
+     * They are later used to find 'key' field in entry and retrieve '1' (second)
+     * item from that field which is expected to form an array list.
+     *
+     * If the process fails empty optional object is returned.
+     *
+     * @param entry should contain expected array field
+     * @param arrayMatcher contains key and index groups after pattern has been matched
+     * @return matched field or empty optional object
+     */
+    private Optional<Object> getFieldFromArray(final CDAEntry entry, final Matcher arrayMatcher) {
+        String arrayFieldKey = arrayMatcher.group(1);
+        int index = Integer.parseInt(arrayMatcher.group(2));
+        return getField(entry, arrayFieldKey).map(field -> {
+            if (field instanceof ArrayList) {
+                ArrayList arrayList = (ArrayList) field;
+                if (index < arrayList.size()) {
+                    return arrayList.get(index);
+                }
+            }
+            return null;
+        });
     }
 
     private Optional<Object> getField(final CDAEntry entry, final String fieldKey) {
         return Optional.ofNullable(entry.getField(fieldKey));
     }
 
+    private Optional<String> getContent(CDAEntry entry, String fieldKey, Object field) {
+        return findContentTypeField(entry, fieldKey).flatMap(contentTypeField ->
+                getContentBasedOnType(field, contentTypeField));
+    }
+
+    /**
+     * Find content type of an entry and validate if it's supported by this implementation.
+     */
     private Optional<CDAField> findContentTypeField(final CDAEntry entry, final String fieldKey) {
         return entry.contentType().fields().stream()
-                .filter(field -> field.id().equals(fieldKey) && FieldTypes.ALL_SUPPORTED.contains(field.type()))
+                .filter(field -> field.id().equals(fieldKey) && isSupported(field.type()))
                 .findAny();
     }
 
     /**
      * Convert content of the field to String if possible.
      *
-     * @param entryField object to convert to string
-     * @param contentTypeField information about object's type
+     * @param field object to convert to string
+     * @param contentType information about field's type
      * @return content of the field in String representation if possible
      */
-    private Optional<String> getContentBasedOnType(final Object entryField, final CDAField contentTypeField) {
-        if (FieldTypes.CONVERTABLE_TO_STRING.contains(contentTypeField.type())) {
-            return Optional.of(String.valueOf(entryField));
-        } else if (FieldTypes.LINK_ASSET.equals(contentTypeField.linkType())) {
-            return Optional.ofNullable(((CDAAsset) entryField).url());
+    private Optional<String> getContentBasedOnType(final Object field, final CDAField contentType) {
+        if (hasStringRepresentation(contentType)) {
+            return Optional.of(String.valueOf(field));
+        } else if (isAsset(contentType)) {
+            return Optional.ofNullable(((CDAAsset) field).url());
         }
         return Optional.empty();
     }
