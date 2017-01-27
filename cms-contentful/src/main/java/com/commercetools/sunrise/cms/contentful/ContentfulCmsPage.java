@@ -1,7 +1,6 @@
 package com.commercetools.sunrise.cms.contentful;
 
 import com.commercetools.sunrise.cms.CmsPage;
-import com.contentful.java.cda.CDAAsset;
 import com.contentful.java.cda.CDAEntry;
 import com.contentful.java.cda.CDAField;
 import org.apache.commons.lang3.StringUtils;
@@ -10,9 +9,8 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.commercetools.sunrise.cms.contentful.models.FieldType.hasStringRepresentation;
-import static com.commercetools.sunrise.cms.contentful.models.FieldType.isAsset;
-import static com.commercetools.sunrise.cms.contentful.models.FieldType.isSupported;
+import static com.commercetools.sunrise.cms.contentful.models.FieldType.ARRAY;
+import static com.commercetools.sunrise.cms.contentful.models.FieldType.getToStringStrategy;
 import static java.util.Arrays.copyOfRange;
 import static org.apache.commons.lang3.StringUtils.split;
 
@@ -122,11 +120,13 @@ public class ContentfulCmsPage implements CmsPage {
         Matcher arrayMatcher = ARRAY_KEY_PATTERN.matcher(fieldKey);
         if (arrayMatcher.find()) {
             String arrayFieldKey = arrayMatcher.group(1);
-            return getFieldFromArray(entry, arrayMatcher).flatMap(field ->
-                    getContent(entry, arrayFieldKey, field));
+            return findContentTypeField(entry, arrayFieldKey, true).flatMap(contentTypeField ->
+                    getFieldFromArray(entry, arrayMatcher).map(field ->
+                            getContentBasedOnType(field, contentTypeField)));
         }
-        return getField(entry, fieldKey).flatMap(field ->
-                getContent(entry, fieldKey, field));
+        return findContentTypeField(entry, fieldKey, false).flatMap(contentTypeField ->
+                Optional.ofNullable(entry.getField(fieldKey)).map(field ->
+                        getContentBasedOnType(field, contentTypeField)));
     }
 
     /**
@@ -147,32 +147,25 @@ public class ContentfulCmsPage implements CmsPage {
     private Optional<Object> getFieldFromArray(final CDAEntry entry, final Matcher arrayMatcher) {
         String arrayFieldKey = arrayMatcher.group(1);
         int index = Integer.parseInt(arrayMatcher.group(2));
-        return getField(entry, arrayFieldKey).map(field -> {
-            if (field instanceof ArrayList) {
-                ArrayList arrayList = (ArrayList) field;
-                if (index < arrayList.size()) {
-                    return arrayList.get(index);
-                }
+        Object field = entry.getField(arrayFieldKey);
+        Object item = null;
+        if (field != null && field instanceof ArrayList) {
+            ArrayList arrayList = (ArrayList) field;
+            if (index < arrayList.size()) {
+                item = arrayList.get(index);
             }
-            return null;
-        });
-    }
-
-    private Optional<Object> getField(final CDAEntry entry, final String fieldKey) {
-        return Optional.ofNullable(entry.getField(fieldKey));
-    }
-
-    private Optional<String> getContent(CDAEntry entry, String fieldKey, Object field) {
-        return findContentTypeField(entry, fieldKey).flatMap(contentTypeField ->
-                getContentBasedOnType(field, contentTypeField));
+        }
+        return Optional.ofNullable(item);
     }
 
     /**
      * Find content type of an entry and validate if it's supported by this implementation.
      */
-    private Optional<CDAField> findContentTypeField(final CDAEntry entry, final String fieldKey) {
+    private Optional<CDAField> findContentTypeField(final CDAEntry entry, final String fieldKey,
+                                                    boolean arrayExpected) {
         return entry.contentType().fields().stream()
-                .filter(field -> field.id().equals(fieldKey) && isSupported(field.type()))
+                .filter(field -> field.id().equals(fieldKey))
+                .filter(field -> arrayExpected == ARRAY.type().equals(field.type()))
                 .findAny();
     }
 
@@ -183,13 +176,7 @@ public class ContentfulCmsPage implements CmsPage {
      * @param contentType information about field's type
      * @return content of the field in String representation if possible
      */
-    private Optional<String> getContentBasedOnType(final Object field, final CDAField contentType) {
-        if (hasStringRepresentation(contentType)) {
-            return Optional.of(String.valueOf(field));
-        } else if (isAsset(contentType)) {
-            return Optional.ofNullable(((CDAAsset) field).url());
-        }
-        return Optional.empty();
+    private String getContentBasedOnType(final Object field, final CDAField contentType) {
+        return getToStringStrategy(contentType).apply(field);
     }
-
 }
