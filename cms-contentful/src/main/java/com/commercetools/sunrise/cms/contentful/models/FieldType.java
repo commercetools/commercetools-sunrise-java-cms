@@ -17,7 +17,6 @@ public enum FieldType {
     SYMBOL("Symbol", true),
     TEXT("Text", true),
     LOCATION("Location", true),
-    LINK("Link", false),
     ASSET("Asset", false),
     ARRAY("Array", false);
 
