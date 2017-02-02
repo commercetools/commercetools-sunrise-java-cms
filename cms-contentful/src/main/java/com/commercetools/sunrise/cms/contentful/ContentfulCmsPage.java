@@ -10,17 +10,27 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.commercetools.sunrise.cms.contentful.models.FieldType.ARRAY;
 import static com.commercetools.sunrise.cms.contentful.models.FieldType.toStringStrategy;
+import static com.commercetools.sunrise.cms.contentful.models.FieldType.isArray;
 import static java.util.Arrays.copyOfRange;
 import static org.apache.commons.lang3.StringUtils.split;
 
+/**
+ * Immutable representation of CMS retrieved from Contentful platform.
+ *
+ * Object of this class provides access to all fields in the subtree stored in retrieved CDAEntry.
+ *
+ * In the Contentful CMS realm there is a distinction between CDAEntry and CDAField (or CDAAsset) the latter of which
+ * can be retrieved as a String by field() method.
+ * Last path segment (or the first one if there is only one segment) is supposed to match a field which
+ * should be representable as String.
+ */
 public class ContentfulCmsPage implements CmsPage {
 
     private static final Pattern ARRAY_KEY_PATTERN = Pattern.compile("(.+)\\[(\\d+)\\]$");
 
-    private CDAEntry cdaEntry;
-    private List<Locale> locales;
+    private final CDAEntry cdaEntry;
+    private final List<Locale> locales;
 
     public ContentfulCmsPage(final CDAEntry cdaEntry, final List<Locale> locales) {
         this.cdaEntry = cdaEntry;
@@ -167,7 +177,7 @@ public class ContentfulCmsPage implements CmsPage {
                                                     boolean arrayExpected) {
         return entry.contentType().fields().stream()
                 .filter(field -> field.id().equals(fieldKey))
-                .filter(field -> arrayExpected == ARRAY.type().equals(field.type()))
+                .filter(field -> arrayExpected == isArray(field))
                 .findAny();
     }
 
