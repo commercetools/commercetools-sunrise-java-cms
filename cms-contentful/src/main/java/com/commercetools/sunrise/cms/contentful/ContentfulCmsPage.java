@@ -10,8 +10,8 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.commercetools.sunrise.cms.contentful.models.FieldType.toStringStrategy;
-import static com.commercetools.sunrise.cms.contentful.models.FieldType.isArray;
+import static com.commercetools.sunrise.cms.contentful.FieldType.toStringStrategy;
+import static com.commercetools.sunrise.cms.contentful.FieldType.isArray;
 import static java.util.Arrays.copyOfRange;
 import static org.apache.commons.lang3.StringUtils.split;
 

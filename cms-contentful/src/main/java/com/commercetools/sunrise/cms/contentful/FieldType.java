@@ -1,4 +1,4 @@
-package com.commercetools.sunrise.cms.contentful.models;
+package com.commercetools.sunrise.cms.contentful;
 
 import com.contentful.java.cda.CDAAsset;
 import com.contentful.java.cda.CDAField;
@@ -22,10 +22,10 @@ import java.util.stream.Collectors;
  * accordingly.
  *
  * The 'Asset' type indicates that the String representation of the field is the result of its 'url()' method.
- * Moreover, 'Asset' type is supposed to be contained in 'linkType' attribute of content type field, unlike in other
+ * Moreover, 'Asset' type is supposed to be contained in 'linkType' attribute of content type field, unlike in all other
  * cases where 'type' attribute is used for matching.
  */
-public enum FieldType {
+enum FieldType {
     BOOLEAN("Boolean", true),
     DATE("Date", true),
     INTEGER("Integer", true),
@@ -50,11 +50,11 @@ public enum FieldType {
         this.hasStringRepresentation = hasStringRepresentation;
     }
 
-    public String type() {
+    String type() {
         return type;
     }
 
-    public static Function<Object, String> toStringStrategy(final CDAField contentType) {
+    static Function<Object, String> toStringStrategy(final CDAField contentType) {
         if (hasStringRepresentation(getType(contentType))) {
             return String::valueOf;
         } else if (isAsset(getLinkType(contentType))) {
@@ -63,7 +63,7 @@ public enum FieldType {
         return field -> null;
     }
 
-    public static boolean isArray(final CDAField contentType) {
+    static boolean isArray(final CDAField contentType) {
         return ARRAY.type().equals(contentType.type());
     }
 
