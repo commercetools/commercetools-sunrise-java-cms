@@ -15,7 +15,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
 /**
- * Service that provides page content, coming from Contentful.
+ * Service that provides access to CMS pages on Contentful platform.
  */
 public class ContentfulCmsService implements CmsService {
 
