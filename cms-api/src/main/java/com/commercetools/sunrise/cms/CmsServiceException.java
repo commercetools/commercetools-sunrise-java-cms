@@ -17,4 +17,8 @@ public class CmsServiceException extends RuntimeException {
     public CmsServiceException(final Throwable cause) {
         super(cause);
     }
+
+    public CmsServiceException(final String message) {
+        super(message);
+    }
 }
