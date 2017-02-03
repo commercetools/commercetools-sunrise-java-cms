@@ -30,11 +30,9 @@ public class ContentfulCmsPage implements CmsPage {
     private static final Pattern ARRAY_KEY_PATTERN = Pattern.compile("(.+)\\[(\\d+)\\]$");
 
     private final CDAEntry cdaEntry;
-    private final List<Locale> locales;
 
-    public ContentfulCmsPage(final CDAEntry cdaEntry, final List<Locale> locales) {
+    ContentfulCmsPage(final CDAEntry cdaEntry) {
         this.cdaEntry = cdaEntry;
-        this.locales = locales;
     }
 
     @Override
