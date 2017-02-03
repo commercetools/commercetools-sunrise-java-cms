@@ -3,10 +3,12 @@ package com.commercetools.sunrise.cms;
 import java.util.Optional;
 
 /**
- * A hierarchical access-only collection of cms nodes that provides access to their string representations.
+ * A hierarchical read-only collection of cms nodes that provides access to their string representations.
+ *
+ * CMS page is a subtree of a CMS.
  *
  * User of CmsPage is expected to know the structure of objects in cms and provide proper path to access
- * any field within the cms.
+ * any field within fetched cms page.
  */
 public interface CmsPage {
 
