@@ -5,12 +5,13 @@ import com.contentful.java.cda.CDAEntry;
 import com.contentful.java.cda.CDAField;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.commercetools.sunrise.cms.contentful.models.FieldType.ARRAY;
-import static com.commercetools.sunrise.cms.contentful.models.FieldType.getToStringStrategy;
+import static com.commercetools.sunrise.cms.contentful.models.FieldType.toStringStrategy;
 import static java.util.Arrays.copyOfRange;
 import static org.apache.commons.lang3.StringUtils.split;
 
@@ -94,15 +95,16 @@ public class ContentfulCmsPage implements CmsPage {
      * @param arrayMatcher contains key and index groups after pattern has been matched
      * @return matched entry or null
      */
+    @Nullable
     private Object getEntryFromArray(final CDAEntry parentEntry, final Matcher arrayMatcher) {
         String arrayEntryKey = arrayMatcher.group(1);
         int index = Integer.parseInt(arrayMatcher.group(2));
         if (parentEntry.rawFields().containsKey(arrayEntryKey)) {
             Object field = parentEntry.getField(arrayEntryKey);
-            if (field instanceof ArrayList) {
-                ArrayList arrayList = (ArrayList) field;
-                if (index < arrayList.size()) {
-                    return arrayList.get(index);
+            if (field instanceof List) {
+                List list = (List) field;
+                if (index < list.size()) {
+                    return list.get(index);
                 }
             }
         }
@@ -149,10 +151,10 @@ public class ContentfulCmsPage implements CmsPage {
         int index = Integer.parseInt(arrayMatcher.group(2));
         Object field = entry.getField(arrayFieldKey);
         Object item = null;
-        if (field != null && field instanceof ArrayList) {
-            ArrayList arrayList = (ArrayList) field;
-            if (index < arrayList.size()) {
-                item = arrayList.get(index);
+        if (field != null && field instanceof List) {
+            List list = (List) field;
+            if (index < list.size()) {
+                item = list.get(index);
             }
         }
         return Optional.ofNullable(item);
@@ -177,6 +179,6 @@ public class ContentfulCmsPage implements CmsPage {
      * @return content of the field in String representation if possible
      */
     private String getContentBasedOnType(final Object field, final CDAField contentType) {
-        return getToStringStrategy(contentType).apply(field);
+        return toStringStrategy(contentType).apply(field);
     }
 }

@@ -39,7 +39,7 @@ public enum FieldType {
         return type;
     }
 
-    public static Function<Object, String> getToStringStrategy(final CDAField contentType) {
+    public static Function<Object, String> toStringStrategy(final CDAField contentType) {
         if (hasStringRepresentation(getType(contentType))) {
             return String::valueOf;
         } else if (isAsset(getLinkType(contentType))) {
