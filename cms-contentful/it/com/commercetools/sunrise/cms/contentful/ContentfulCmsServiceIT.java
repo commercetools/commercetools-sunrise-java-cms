@@ -52,7 +52,8 @@ public class ContentfulCmsServiceIT {
         Optional<CmsPage> content = waitAndGet(contentfulCmsService.page("finn", SUPPORTED_LOCALES));
 
         assertThat(content).isPresent();
-        assertThat(content.get().field("pageContent.description")).contains("Fearless Abenteurer! Verteidiger von Pfannkuchen.");
+        Optional<String> field = content.get().field("pageContent.description");
+        assertThat(field).hasValue("Fearless Abenteurer! Verteidiger von Pfannkuchen.");
     }
 
     @Test
@@ -62,7 +63,8 @@ public class ContentfulCmsServiceIT {
         Optional<CmsPage> content = waitAndGet(contentfulCmsService.page("finn", emptyList()));
 
         assertThat(content).isPresent();
-        assertThat(content.get().field("pageContent.description")).contains("Fearless Abenteurer! Verteidiger von Pfannkuchen.");
+        Optional<String> field = content.get().field("pageContent.description");
+        assertThat(field).hasValue("Fearless Abenteurer! Verteidiger von Pfannkuchen.");
     }
 
     @Test
@@ -72,7 +74,8 @@ public class ContentfulCmsServiceIT {
         Optional<CmsPage> content = waitAndGet(contentfulCmsService.page("finn", null));
 
         assertThat(content).isPresent();
-        assertThat(content.get().field("pageContent.description")).contains("Fearless Abenteurer! Verteidiger von Pfannkuchen.");
+        Optional<String> field = content.get().field("pageContent.description");
+        assertThat(field).hasValue("Fearless Abenteurer! Verteidiger von Pfannkuchen.");
     }
 
     @Test
@@ -82,7 +85,8 @@ public class ContentfulCmsServiceIT {
         Optional<CmsPage> content = waitAndGet(contentfulCmsService.page("finn", singletonList(Locale.ENGLISH)));
 
         assertThat(content).isPresent();
-        assertThat(content.get().field("pageContent.description")).contains("Fearless adventurer! Defender of pancakes.");
+        Optional<String> field = content.get().field("pageContent.description");
+        assertThat(field).hasValue("Fearless adventurer! Defender of pancakes.");
     }
 
     @Test
@@ -91,15 +95,18 @@ public class ContentfulCmsServiceIT {
 
         Optional<CmsPage> content = waitAndGet(contentfulCmsService.page("finn", singletonList(Locale.ITALIAN)));
 
-        assertThat(content).isEmpty();
+        assertThat(content).isNotPresent();
     }
 
     @Test
     public void whenAskForNotExistingStringContent_thenReturnEmpty() throws Exception {
         ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), PAGE_TYPE_NAME, PAGE_TYPE_ID_FIELD_NAME);
+
         Optional<CmsPage> content = waitAndGet(contentfulCmsService.page("finn", SUPPORTED_LOCALES));
+
         assertThat(content).isPresent();
-        assertThat(content.get().field("pageContent.notExistingField")).isEmpty();
+        Optional<String> field = content.get().field("pageContent.notExistingField");
+        assertThat(field).isNotPresent();
     }
 
     @Test
@@ -109,7 +116,8 @@ public class ContentfulCmsServiceIT {
         Optional<CmsPage> content = waitAndGet(contentfulCmsService.page("jacke", SUPPORTED_LOCALES));
 
         assertThat(content).isPresent();
-        assertThat(content.get().fieldOrEmpty("pageContent.image")).isEqualToIgnoringCase("//images.contentful.com/l6chdlzlf8jn/2iVeCh1FGoy00Oq8WEI2aI/93c3f0841fcf59743f57e238f6ed67aa/jake.png");
+        String actual = content.get().fieldOrEmpty("pageContent.image");
+        assertThat(actual).isEqualToIgnoringCase("//images.contentful.com/l6chdlzlf8jn/2iVeCh1FGoy00Oq8WEI2aI/93c3f0841fcf59743f57e238f6ed67aa/jake.png");
     }
 
     @Test
@@ -119,7 +127,8 @@ public class ContentfulCmsServiceIT {
         Optional<CmsPage> content = waitAndGet(contentfulCmsService.page("jacke", SUPPORTED_LOCALES));
 
         assertThat(content).isPresent();
-        assertThat(content.get().fieldOrEmpty("pageContent.notExistingAsset")).isEmpty();
+        String actual = content.get().fieldOrEmpty("pageContent.notExistingAsset");
+        assertThat(actual).isEmpty();
 
     }
 
@@ -130,16 +139,17 @@ public class ContentfulCmsServiceIT {
 
         assertThat(content).isPresent();
         Optional<String> field = content.get().field("array[0].name");
-        assertThat(field).isPresent();
-        assertThat(field.get()).isEqualTo("author1");
+        assertThat(field).hasValue("author1");
     }
 
     @Test
     public void whenAskForContentInArrayOutsideTheScope_thenReturnEmpty() throws Exception {
         ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), "finn", PAGE_TYPE_ID_FIELD_NAME);
+
         Optional<CmsPage> content = contentfulCmsService.page("finn", emptyList()).toCompletableFuture().get(5, TimeUnit.SECONDS);
 
         assertThat(content).isPresent();
+        // array element consists of only 4 items
         Optional<String> field = content.get().field("array[4].name");
         assertThat(field).isNotPresent();
     }
@@ -147,12 +157,12 @@ public class ContentfulCmsServiceIT {
     @Test
     public void whenAskForContentInNestedArray_thenGetElement() throws Exception {
         ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), "finn", PAGE_TYPE_ID_FIELD_NAME);
+
         Optional<CmsPage> content = contentfulCmsService.page("finn", emptyList()).toCompletableFuture().get(5, TimeUnit.SECONDS);
 
         assertThat(content).isPresent();
         Optional<String> field = content.get().field("array[1].images[1].photo");
-        assertThat(field).isPresent();
-        assertThat(field.get()).isEqualTo("//images.contentful.com/l6chdlzlf8jn/3slBXXe6WcsiM46OuEuIKe/bab374a315d1825c111d9d89843cafc0/logo.gif");
+        assertThat(field).hasValue("//images.contentful.com/l6chdlzlf8jn/3slBXXe6WcsiM46OuEuIKe/bab374a315d1825c111d9d89843cafc0/logo.gif");
     }
 
     @Test
@@ -163,8 +173,7 @@ public class ContentfulCmsServiceIT {
 
         assertThat(content).isPresent();
         Optional<String> field = content.get().field("array[2].simpleText");
-        assertThat(field).isPresent();
-        assertThat(field.get()).isEqualTo("simpleText1");
+        assertThat(field).hasValue("simpleText1");
     }
 
     @Test
@@ -175,8 +184,7 @@ public class ContentfulCmsServiceIT {
 
         assertThat(content).isPresent();
         Optional<String> field = content.get().field("locationField");
-        assertThat(field).isPresent();
-        assertThat(field.get()).isEqualTo("{lon=19.62158203125, lat=51.37199469960235}");
+        assertThat(field).hasValue("{lon=19.62158203125, lat=51.37199469960235}");
     }
 
     @Test
@@ -187,8 +195,7 @@ public class ContentfulCmsServiceIT {
 
         assertThat(content).isPresent();
         Optional<String> field = content.get().field("mediaOneFile");
-        assertThat(field).isPresent();
-        assertThat(field.get()).isEqualTo("//images.contentful.com/l6chdlzlf8jn/2m1NzbeXYUksOGIwceEy0U/4e3cc53a96313a4bd822777af78a3b4d/some-5.jpg");
+        assertThat(field).hasValue("//images.contentful.com/l6chdlzlf8jn/2m1NzbeXYUksOGIwceEy0U/4e3cc53a96313a4bd822777af78a3b4d/some-5.jpg");
     }
 
     @Test
@@ -199,20 +206,20 @@ public class ContentfulCmsServiceIT {
 
         assertThat(content).isPresent();
         Optional<String> field = content.get().field("mediaManyFiles[0]");
-        assertThat(field).isPresent();
-        assertThat(field.get()).isEqualTo("//images.contentful.com/l6chdlzlf8jn/6j9p38phC0oU0g42aqUSc4/2eb0c261bc13353ed867b13076af6b1f/logo.gif");
+        assertThat(field).hasValue("//images.contentful.com/l6chdlzlf8jn/6j9p38phC0oU0g42aqUSc4/2eb0c261bc13353ed867b13076af6b1f/logo.gif");
 
         field = content.get().field("mediaManyFiles[1]");
-        assertThat(field).isPresent();
-        assertThat(field.get()).isEqualTo("//images.contentful.com/l6chdlzlf8jn/27BPx56xMcuGKe8uk8Auss/335581cd9daf3e9d0de254313e36d43b/some-5.jpg");
+        assertThat(field).hasValue("//images.contentful.com/l6chdlzlf8jn/27BPx56xMcuGKe8uk8Auss/335581cd9daf3e9d0de254313e36d43b/some-5.jpg");
     }
 
     @Test
-    public void whenAskForContentInArrayOutsideTheScope_thenGet() throws Exception {
+    public void whenAskForArray_thenReturnEmpty() throws Exception {
         ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), "finn", PAGE_TYPE_ID_FIELD_NAME);
+
         Optional<CmsPage> content = contentfulCmsService.page("finn", emptyList()).toCompletableFuture().get(5, TimeUnit.SECONDS);
 
         assertThat(content).isPresent();
+        // textArrayField is an array element so it can't be fetched as a whole
         Optional<String> field = content.get().field("array[3].textArrayField");
         assertThat(field).isNotPresent();
     }
@@ -225,26 +232,15 @@ public class ContentfulCmsServiceIT {
 
         assertThat(content).isPresent();
         Optional<String> field = content.get().field("array[3].textArrayField[1]");
-        assertThat(field).isPresent();
-        assertThat(field.get()).isEqualTo("zwei");
+        assertThat(field).hasValue("zwei");
 
         content = contentfulCmsService.page("finn", emptyList()).toCompletableFuture().get(5, TimeUnit.SECONDS);
 
         assertThat(content).isPresent();
         field = content.get().field("array[3].textArrayField[1]");
-        assertThat(field).isPresent();
-        assertThat(field.get()).isEqualTo("zwei");
+        assertThat(field).hasValue("zwei");
 
         content = waitAndGet(contentfulCmsService.page("finn", singletonList(Locale.ITALIAN)));
-
-        assertThat(content).isNotPresent();
-    }
-
-    @Test
-    public void whenAskForContentWithNonExistingLocales_thenReturnEmpty() throws Exception {
-        ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), "finn", PAGE_TYPE_ID_FIELD_NAME);
-
-        Optional<CmsPage> content = waitAndGet(contentfulCmsService.page("finn", singletonList(Locale.ITALIAN)));
 
         assertThat(content).isNotPresent();
     }
@@ -257,8 +253,7 @@ public class ContentfulCmsServiceIT {
 
         assertThat(content).isPresent();
         Optional<String> field = content.get().field("array[3].textArrayField[1]");
-        assertThat(field).isPresent();
-        assertThat(field.get()).isEqualTo("two");
+        assertThat(field).hasValue("two");
     }
 
     private <T> T waitAndGet(final CompletionStage<T> stage) throws InterruptedException, ExecutionException, TimeoutException {
