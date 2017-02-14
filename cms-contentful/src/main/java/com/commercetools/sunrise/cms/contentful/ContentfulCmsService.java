@@ -13,6 +13,7 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
+import java.util.concurrent.Executor;
 
 /**
  * Service providing access to CMS pages from Contentful platform.
@@ -27,11 +28,13 @@ public class ContentfulCmsService implements CmsService {
     private final CDAClient client;
     private final String pageType;
     private final String pageQueryField;
+    private final Executor callbackExecutor;
 
-    private ContentfulCmsService(CDAClient client, String pageType, String pageQueryField) {
+    private ContentfulCmsService(CDAClient client, String pageType, String pageQueryField, Executor callbackExecutor) {
         this.client = client;
         this.pageType = pageType;
         this.pageQueryField = "fields." + pageQueryField;
+        this.callbackExecutor = callbackExecutor;
     }
 
     /**
@@ -69,8 +72,9 @@ public class ContentfulCmsService implements CmsService {
     /**
      * Creates new instance of ContentfulCmsService based on Contentful account credentials
      */
-    public static ContentfulCmsService of(String spaceId, String token, String pageType, String pageQueryField) {
-        return new ContentfulCmsService(createClient(spaceId, token), pageType, pageQueryField);
+    public static ContentfulCmsService of(String spaceId, String token, String pageType, String pageQueryField,
+                                          Executor callbackExecutor) {
+        return new ContentfulCmsService(createClient(spaceId, token), pageType, pageQueryField, callbackExecutor);
     }
 
     private static CDAClient createClient(String spaceId, String token) {
@@ -95,12 +99,14 @@ public class ContentfulCmsService implements CmsService {
 
         CompletableFuture<Optional<CDAEntry>> fetch() {
             ContentfulCallback contentfulCallback = new ContentfulCallback();
-            client.fetch(CDAEntry.class)
-                    .where("content_type", pageType)
-                    .where("include", "10") // levels of entries to include in fetched hierarchy; 10 is Contentful's max
-                    .where("locale", locale)
-                    .where(pageQueryField, pageKey)
-                    .all(contentfulCallback);
+            callbackExecutor.execute(() ->
+                    client.fetch(CDAEntry.class)
+                            .where("content_type", pageType)
+                            .where("include", "10") // levels of entries to include in fetched hierarchy; 10 is Contentful's max
+                            .where("locale", locale)
+                            .where(pageQueryField, pageKey)
+                            .all(contentfulCallback)
+            );
             return contentfulCallback.toCompletableFuture();
         }
 

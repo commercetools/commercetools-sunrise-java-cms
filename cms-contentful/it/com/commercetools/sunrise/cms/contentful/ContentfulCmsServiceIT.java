@@ -26,7 +26,7 @@ public class ContentfulCmsServiceIT {
 
     @Test
     public void whenCouldNotFetchEntry_thenThrowException() throws Exception {
-        CmsService cmsService = ContentfulCmsService.of("", "", PAGE_TYPE_NAME, PAGE_TYPE_ID_FIELD_NAME);
+        CmsService cmsService = ContentfulCmsService.of("", "", PAGE_TYPE_NAME, PAGE_TYPE_ID_FIELD_NAME, Runnable::run);
 
         Throwable thrown = catchThrowable(() -> waitAndGet(cmsService.page("home", SUPPORTED_LOCALES)));
 
@@ -99,7 +99,7 @@ public class ContentfulCmsServiceIT {
 
     @Test
     public void whenAskForContentInArray_thenGetElement() throws Exception {
-        ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), "finn", PAGE_TYPE_ID_FIELD_NAME);
+        ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), "finn", PAGE_TYPE_ID_FIELD_NAME, Runnable::run);
         Optional<CmsPage> content = contentfulCmsService.page("finn", emptyList()).toCompletableFuture().get(5, TimeUnit.SECONDS);
 
         assertThat(content).isPresent();
@@ -109,7 +109,7 @@ public class ContentfulCmsServiceIT {
 
     @Test
     public void whenAskForContentInArrayOutsideTheScope_thenReturnEmpty() throws Exception {
-        ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), "finn", PAGE_TYPE_ID_FIELD_NAME);
+        ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), "finn", PAGE_TYPE_ID_FIELD_NAME, Runnable::run);
 
         Optional<CmsPage> content = contentfulCmsService.page("finn", emptyList()).toCompletableFuture().get(5, TimeUnit.SECONDS);
 
@@ -121,7 +121,7 @@ public class ContentfulCmsServiceIT {
 
     @Test
     public void whenAskForContentInNestedArray_thenGetElement() throws Exception {
-        ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), "finn", PAGE_TYPE_ID_FIELD_NAME);
+        ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), "finn", PAGE_TYPE_ID_FIELD_NAME, Runnable::run);
 
         Optional<CmsPage> content = contentfulCmsService.page("finn", emptyList()).toCompletableFuture().get(5, TimeUnit.SECONDS);
 
@@ -132,7 +132,7 @@ public class ContentfulCmsServiceIT {
 
     @Test
     public void whenAskForTextContentArray_thenGetElement() throws Exception {
-        ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), "finn", PAGE_TYPE_ID_FIELD_NAME);
+        ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), "finn", PAGE_TYPE_ID_FIELD_NAME, Runnable::run);
 
         Optional<CmsPage> content = contentfulCmsService.page("finn", emptyList()).toCompletableFuture().get(5, TimeUnit.SECONDS);
 
@@ -143,7 +143,7 @@ public class ContentfulCmsServiceIT {
 
     @Test
     public void whenAskForLocation_thenGetLocationField() throws Exception {
-        ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), "finn", PAGE_TYPE_ID_FIELD_NAME);
+        ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), "finn", PAGE_TYPE_ID_FIELD_NAME, Runnable::run);
 
         Optional<CmsPage> content = contentfulCmsService.page("finn", emptyList()).toCompletableFuture().get(5, TimeUnit.SECONDS);
 
@@ -154,7 +154,7 @@ public class ContentfulCmsServiceIT {
 
     @Test
     public void whenAskForContentInMediaField_thenGetUrlField() throws Exception {
-        ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), "finn", PAGE_TYPE_ID_FIELD_NAME);
+        ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), "finn", PAGE_TYPE_ID_FIELD_NAME, Runnable::run);
 
         Optional<CmsPage> content = contentfulCmsService.page("finn", emptyList()).toCompletableFuture().get(5, TimeUnit.SECONDS);
 
@@ -165,7 +165,7 @@ public class ContentfulCmsServiceIT {
 
     @Test
     public void whenAskForContentInMediaArray_thenGetUrlElements() throws Exception {
-        ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), "finn", PAGE_TYPE_ID_FIELD_NAME);
+        ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), "finn", PAGE_TYPE_ID_FIELD_NAME, Runnable::run);
 
         Optional<CmsPage> content = contentfulCmsService.page("finn", emptyList()).toCompletableFuture().get(5, TimeUnit.SECONDS);
 
@@ -179,7 +179,7 @@ public class ContentfulCmsServiceIT {
 
     @Test
     public void whenAskForArray_thenReturnEmpty() throws Exception {
-        ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), "finn", PAGE_TYPE_ID_FIELD_NAME);
+        ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), "finn", PAGE_TYPE_ID_FIELD_NAME, Runnable::run);
 
         Optional<CmsPage> content = contentfulCmsService.page("finn", emptyList()).toCompletableFuture().get(5, TimeUnit.SECONDS);
 
@@ -191,7 +191,7 @@ public class ContentfulCmsServiceIT {
 
     @Test
     public void whenAskForContentWithGermanOrEmptyLocales_thenGetGermanTranslation() throws Exception {
-        ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), "finn", PAGE_TYPE_ID_FIELD_NAME);
+        ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), "finn", PAGE_TYPE_ID_FIELD_NAME, Runnable::run);
 
         Optional<CmsPage> content = contentfulCmsService.page("finn", SUPPORTED_LOCALES).toCompletableFuture().get(5, TimeUnit.SECONDS);
 
@@ -212,7 +212,7 @@ public class ContentfulCmsServiceIT {
 
     @Test
     public void whenAskForContentWithEnglishTranslation_thenGetEnglishTranslation() throws Exception {
-        ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), "finn", PAGE_TYPE_ID_FIELD_NAME);
+        ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), "finn", PAGE_TYPE_ID_FIELD_NAME, Runnable::run);
 
         Optional<CmsPage> content = contentfulCmsService.page("finn", singletonList(Locale.ENGLISH)).toCompletableFuture().get(5, TimeUnit.SECONDS);
 
@@ -226,7 +226,7 @@ public class ContentfulCmsServiceIT {
     }
 
     private CmsService createService() {
-        return ContentfulCmsService.of(spaceId(), token(), PAGE_TYPE_NAME, PAGE_TYPE_ID_FIELD_NAME);
+        return ContentfulCmsService.of(spaceId(), token(), PAGE_TYPE_NAME, PAGE_TYPE_ID_FIELD_NAME, Runnable::run);
     }
 
     private static String spaceId() {
@@ -241,8 +241,8 @@ public class ContentfulCmsServiceIT {
         return Optional.ofNullable(System.getenv(key))
                 .orElseThrow(() -> new RuntimeException(
                         "Missing environment variable " + key + ", please provide the following environment variables for the integration test:\n" +
-                                "export " + ("CONTENTFUL_" + "SPACE_ID") + "=\"Your Contentful project key\"\n" +
-                                "export " + ("CONTENTFUL_" + "TOKEN") + "=\"Your Contentful authentication token\"\n"));
+                                "export " + "CONTENTFUL_SPACE_ID" + "=\"Your Contentful project key\"\n" +
+                                "export " + "CONTENTFUL_TOKEN" + "=\"Your Contentful authentication token\"\n"));
     }
 
 }
