@@ -31,7 +31,7 @@ public class ContentfulCmsPage implements CmsPage {
 
     private final CDAEntry cdaEntry;
 
-    ContentfulCmsPage(final CDAEntry cdaEntry) {
+    public ContentfulCmsPage(final CDAEntry cdaEntry) {
         this.cdaEntry = cdaEntry;
     }
 
