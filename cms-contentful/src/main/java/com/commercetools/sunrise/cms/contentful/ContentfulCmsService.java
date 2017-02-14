@@ -15,9 +15,12 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
 /**
- * Service that provides access to CMS pages on Contentful platform.
+ * Service providing access to CMS pages from Contentful platform.
  *
- * TODO PB explain that the service can not be created for entire space but rather for given pageType and queryField
+ * Instance of the service is created per Contentful page type and one of this type's fields upon which query will
+ * be executed. A consequence of that is that content should be uniquely identified by chosen field. If there is more
+ * than one entity of chosen type with the same query field Contentful will return all of them but this service
+ * will return CmsServiceException informing about non-unique identifier used.
  */
 public class ContentfulCmsService implements CmsService {
 
@@ -46,9 +49,16 @@ public class ContentfulCmsService implements CmsService {
                 .thenApply(cdaEntry -> cdaEntry.map(ContentfulCmsPage::new));
     }
 
-    // TODO PB explanation
+    /**
+     * Convert first of provided locales to a String expected by Contentful. If list is empty return asterisk: '*'
+     * which will make request independent of locale.
+     *
+     * Contentful provides only single locale to be set per request.
+     *
+     * @param locales list of locales with only first one relevant for Contentful
+     * @return string representation of requested locale adjusted for Contentful
+     */
     private String getLocaleForContentful(List<Locale> locales) {
-        // currently contentful provides only single locale to be set per request
         return locales.isEmpty() ? "*" : locales.get(0).toLanguageTag();
     }
 
