@@ -88,26 +88,13 @@ public class ContentfulCmsServiceIT {
     }
 
     @Test
-    public void whenAskForExistingAssetContent_thenGet() throws Exception {
+    public void whenAskForNonUniqueContent_thenThrowException() throws Exception {
         CmsService cmsService = createService();
 
-        Optional<CmsPage> content = waitAndGet(cmsService.page("jacke", SUPPORTED_LOCALES));
+        Throwable thrown = catchThrowable(() -> waitAndGet(cmsService.page("jacke", SUPPORTED_LOCALES)));
 
-        assertThat(content).isPresent();
-        String actual = content.get().fieldOrEmpty("pageContent.image");
-        assertThat(actual).isEqualToIgnoringCase("//images.contentful.com/l6chdlzlf8jn/2iVeCh1FGoy00Oq8WEI2aI/93c3f0841fcf59743f57e238f6ed67aa/jake.png");
-    }
-
-    @Test
-    public void whenAskForNotExistingAssetContent_thenReturnEmpty() throws Exception {
-        CmsService cmsService = createService();
-
-        Optional<CmsPage> content = waitAndGet(cmsService.page("jacke", SUPPORTED_LOCALES));
-
-        assertThat(content).isPresent();
-        String actual = content.get().fieldOrEmpty("pageContent.notExistingAsset");
-        assertThat(actual).isEmpty();
-
+        assertThat(thrown).hasCauseInstanceOf(CmsServiceException.class);
+        assertThat(thrown.getCause()).hasMessage("Non unique identifier used. Result contains more than one page for jacke");
     }
 
     @Test

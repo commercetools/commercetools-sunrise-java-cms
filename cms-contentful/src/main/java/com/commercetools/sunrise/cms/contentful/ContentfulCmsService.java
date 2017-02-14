@@ -7,7 +7,6 @@ import com.contentful.java.cda.CDAArray;
 import com.contentful.java.cda.CDACallback;
 import com.contentful.java.cda.CDAClient;
 import com.contentful.java.cda.CDAEntry;
-import com.contentful.java.cda.CDAResource;
 
 import java.util.List;
 import java.util.Locale;
@@ -24,12 +23,12 @@ public class ContentfulCmsService implements CmsService {
 
     private final CDAClient client;
     private final String pageType;
-    private final String pageQueryFieldName;
+    private final String pageQueryField;
 
-    private ContentfulCmsService(CDAClient client, String pageType, String pageQueryFiel) {
+    private ContentfulCmsService(CDAClient client, String pageType, String pageQueryField) {
         this.client = client;
         this.pageType = pageType;
-        this.pageQueryFieldName = "fields." + pageQueryFiel;
+        this.pageQueryField = "fields." + pageQueryField;
     }
 
     /**
@@ -71,8 +70,11 @@ public class ContentfulCmsService implements CmsService {
                     .build();
     }
 
-    private class ContentCallback extends CDACallback<CDAArray> {
-        private final CompletableFuture<Optional<CDAEntry>> future = new CompletableFuture<>();
+    /**
+     * An Object handling all communication with Contentful platform based on given configuration in order to fetch
+     * requested cms page for given locale.
+     */
+    private class ContentCallback {
         private final String pageKey;
         private final String locale;
 
@@ -81,44 +83,51 @@ public class ContentfulCmsService implements CmsService {
             this.locale = locale;
         }
 
-        @Override
-        protected void onSuccess(final CDAArray result) {
-            future.complete(findCdaEntry(result));
-        }
-
-        @Override
-        protected void onFailure(final Throwable error) {
-            // check an exception when entry type doesn't exist
-            if (error.getMessage().contains("Bad Request")) {
-                future.complete(Optional.empty());
-            } else {
-                future.completeExceptionally(new CmsServiceException("Could not fetch content for " + pageKey, error));
-            }
-        }
-
-        private Optional<CDAEntry> findCdaEntry(CDAArray result) {
-            Optional<CDAEntry> entry = Optional.empty();
-            List<CDAResource> items = result.items();
-            if (items.size() == 1) {
-                CDAResource cdaResource = items.get(0);
-                if (cdaResource instanceof CDAEntry) {
-                    entry = Optional.of((CDAEntry) cdaResource);
-                }
-            } else {
-                throw new CmsServiceException("Non unique identifier used. Result contains more than one page for "
-                        + pageKey);
-            }
-            return entry;
-        }
-
         CompletableFuture<Optional<CDAEntry>> fetch() {
+            ContentfulCallback contentfulCallback = new ContentfulCallback();
             client.fetch(CDAEntry.class)
                     .where("content_type", pageType)
-                    .where("include", "10") // max level of entries to include in fetched hierarchy of entries
+                    .where("include", "10") // levels of entries to include in fetched hierarchy; 10 is Contentful's max
                     .where("locale", locale)
-                    .where(pageQueryFieldName, pageKey)
-                    .all(this);
-            return future;
+                    .where(pageQueryField, pageKey)
+                    .all(contentfulCallback);
+            return contentfulCallback.toCompletableFuture();
+        }
+
+        /**
+         * Wrapper for Contentful's Callback which verifies that only single (unique) item was fetched and returns it
+         * wrapped into CompletableFuture.
+         *
+         * In case fetching failed a meaningful message is returned in CmsServiceException.
+         */
+        private class ContentfulCallback extends CDACallback<CDAArray> {
+            private final CompletableFuture<Optional<CDAEntry>> future = new CompletableFuture<>();
+
+            @Override
+            protected void onSuccess(final CDAArray result) {
+                if (result.items().size() > 1) {
+                    future.completeExceptionally(
+                            new CmsServiceException("Non unique identifier used." +
+                                    " Result contains more than one page for " + pageKey));
+                } else {
+                    future.complete(Optional.of((CDAEntry) result.items().get(0)));
+                }
+            }
+
+            @Override
+            protected void onFailure(final Throwable error) {
+                // check an exception when entry type doesn't exist
+                if (error.getMessage() != null && error.getMessage().contains("code=400")) {
+                    future.complete(Optional.empty());
+                } else {
+                    future.completeExceptionally(
+                            new CmsServiceException("Could not fetch content for " + pageKey, error));
+                }
+            }
+
+            CompletableFuture<Optional<CDAEntry>> toCompletableFuture() {
+                return future;
+            }
         }
     }
 }
