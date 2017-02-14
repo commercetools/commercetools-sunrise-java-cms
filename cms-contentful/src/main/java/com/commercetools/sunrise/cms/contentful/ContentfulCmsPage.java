@@ -6,24 +6,26 @@ import com.contentful.java.cda.CDAField;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.commercetools.sunrise.cms.contentful.FieldType.toStringStrategy;
 import static com.commercetools.sunrise.cms.contentful.FieldType.isArray;
+import static com.commercetools.sunrise.cms.contentful.FieldType.toStringStrategy;
 import static java.util.Arrays.copyOfRange;
 import static org.apache.commons.lang3.StringUtils.split;
 
 /**
  * Immutable representation of CMS retrieved from Contentful platform.
- *
- * Object of this class provides access to all fields in the subtree stored in retrieved CDAEntry.
- *
- * In the Contentful CMS realm there is a distinction between CDAEntry and CDAField (or CDAAsset) the latter of which
- * can be retrieved as a String by field() method.
+ * <p>
+ * Object of this class provides access to all fields in the subtree stored in retrieved {@link CDAEntry}.
+ * <p>
+ * In the Contentful CMS realm there is a distinction between {@link CDAEntry} and {@link CDAField}
+ * (or {@link com.contentful.java.cda.CDAAsset}) the latter of which can be retrieved as a String by
+ * {@link ContentfulCmsPage#field(String)} method.
  * Last path segment (or the first one if there is only one segment) is supposed to match a field which
- * should be representable as String.
+ * should be representable as a string.
  */
 public class ContentfulCmsPage implements CmsPage {
 
@@ -59,7 +61,7 @@ public class ContentfulCmsPage implements CmsPage {
     }
 
     /**
-     * Traverse contained CDAEntry to match all path segments.
+     * Traverse contained {@link CDAEntry} to match all path segments.
      *
      * @param pathSegments array of all path segments that lead to CDAEntry of interest
      * @return CDAEntry that matches path segments
@@ -67,7 +69,7 @@ public class ContentfulCmsPage implements CmsPage {
     private Optional<CDAEntry> findEntry(final String[] pathSegments) {
         CDAEntry entry = cdaEntry;
 
-        for (String key: pathSegments) {
+        for (String key : pathSegments) {
             Object nextEntry = null;
 
             Matcher arrayMatcher = ARRAY_KEY_PATTERN.matcher(key);
@@ -90,16 +92,16 @@ public class ContentfulCmsPage implements CmsPage {
 
     /**
      * Try to get an item from input entry which is supposed to contain an array of fields.
-     *
+     * <p>
      * After pattern has been matched arrayMatcher contains a regexp group of key and index.
      * E.g. after matching 'key[1]' two groups of 'key' and '1' are contained in matcher.
-     *
+     * <p>
      * They are later used to find 'key' field in parentEntry and retrieve '1' (second)
      * item from that field which is expected to form an array list.
-     *
+     * <p>
      * If the process fails null is returned.
      *
-     * @param parentEntry should contain expected array field
+     * @param parentEntry  should contain expected array field
      * @param arrayMatcher contains key and index groups after pattern has been matched
      * @return matched entry or null
      */
@@ -122,7 +124,7 @@ public class ContentfulCmsPage implements CmsPage {
     /**
      * Extract field from an entry and convert it its string representation.
      *
-     * @param entry should contain expected field
+     * @param entry    should contain expected field
      * @param fieldKey id of field to be search inside entry
      * @return string representation of the field
      */
@@ -141,16 +143,16 @@ public class ContentfulCmsPage implements CmsPage {
 
     /**
      * Try to get a field from input entry which is supposed to contain an array of fields.
-     *
+     * <p>
      * After pattern has been matched arrayMatcher contains a regexp group of key and index.
      * E.g. after matching 'key[1]' two groups of 'key' and '1' are contained in matcher.
-     *
+     * <p>
      * They are later used to find 'key' field in entry and retrieve '1' (second)
      * item from that field which is expected to form an array list.
-     *
+     * <p>
      * If the process fails empty optional object is returned.
      *
-     * @param entry should contain expected array field
+     * @param entry        should contain expected array field
      * @param arrayMatcher contains key and index groups after pattern has been matched
      * @return matched field or empty optional object
      */
@@ -180,9 +182,9 @@ public class ContentfulCmsPage implements CmsPage {
     }
 
     /**
-     * Convert content of the field to String if possible.
+     * Convert content of the field to string if possible.
      *
-     * @param field object to convert to string
+     * @param field       object to convert to string
      * @param contentType information about field's type
      * @return content of the field in String representation if possible
      */

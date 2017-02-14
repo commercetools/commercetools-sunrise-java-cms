@@ -17,11 +17,15 @@ import java.util.concurrent.Executor;
 
 /**
  * Service providing access to CMS pages from Contentful platform.
- *
+ * <p>
  * Instance of the service is created per Contentful page type and one of this type's fields upon which query will
  * be executed. A consequence of that is that content should be uniquely identified by chosen field. If there is more
  * than one entity of chosen type with the same query field Contentful will return all of them but this service
- * will return CmsServiceException informing about non-unique identifier used.
+ * will result in {@link CompletableFuture} completed by throwing {@link CmsServiceException}
+ * informing about non-unique identifier used.
+ * <p>
+ * Contentful's JVM executor is synchronous and for that reason this service is built with additional {@link Executor}
+ * parameter to provide its user with control over execution context in which requests are executed.
  */
 public class ContentfulCmsService implements CmsService {
 
@@ -38,13 +42,13 @@ public class ContentfulCmsService implements CmsService {
     }
 
     /**
-     * Gets the page content corresponding to the given key.
+     * Get the page content corresponding to the given key.
      *
      * @param pageKey identifying the page
      * @param locales for the localized content inside the page
-     * @return a {@code CompletionStage} containing the page content identified by the key,
+     * @return a {@link CompletionStage} containing the page content identified by the key,
      * or absent if it could not be found, or a {@link CmsServiceException} if there was a problem
-     * when obtaining the content from Contentful.
+     * when obtaining content
      */
     @Override
     public CompletionStage<Optional<CmsPage>> page(final String pageKey, final List<Locale> locales) {
@@ -53,9 +57,9 @@ public class ContentfulCmsService implements CmsService {
     }
 
     /**
-     * Convert first of provided locales to a String expected by Contentful. If list is empty return asterisk: '*'
+     * Convert first of provided locales to a string expected by Contentful. If list is empty return asterisk: '*'
      * which will make request independent of locale.
-     *
+     * <p>
      * Contentful provides only single locale to be set per request.
      *
      * @param locales list of locales with only first one relevant for Contentful
@@ -70,7 +74,14 @@ public class ContentfulCmsService implements CmsService {
     }
 
     /**
-     * Creates new instance of ContentfulCmsService based on Contentful account credentials
+     * Create new instance of {@link ContentfulCmsService} based on Contentful account credentials.
+     *
+     * @param spaceId          Contentful space ID
+     * @param token            access token to given space
+     * @param pageType         Contentful model's page type to be queried against
+     * @param pageQueryField   pageType field against which query will be run
+     * @param callbackExecutor defines execution context in which requests are executed
+     * @return instance of this service ready to serve content based on given configuration
      */
     public static ContentfulCmsService of(String spaceId, String token, String pageType, String pageQueryField,
                                           Executor callbackExecutor) {
@@ -79,9 +90,9 @@ public class ContentfulCmsService implements CmsService {
 
     private static CDAClient createClient(String spaceId, String token) {
         return CDAClient.builder()
-                    .setSpace(spaceId)
-                    .setToken(token)
-                    .build();
+                .setSpace(spaceId)
+                .setToken(token)
+                .build();
     }
 
     /**
@@ -97,6 +108,9 @@ public class ContentfulCmsService implements CmsService {
             this.locale = locale;
         }
 
+        /**
+         * Execute request to Contentful inside configured {@link Executor} context.
+         */
         CompletableFuture<Optional<CDAEntry>> fetch() {
             ContentfulCallback contentfulCallback = new ContentfulCallback();
             callbackExecutor.execute(() ->
@@ -111,10 +125,10 @@ public class ContentfulCmsService implements CmsService {
         }
 
         /**
-         * Wrapper for Contentful's Callback which verifies that only single (unique) item was fetched and returns it
-         * wrapped into CompletableFuture.
-         *
-         * In case fetching failed a meaningful message is returned in CmsServiceException.
+         * Wrapper for Contentful's callback which verifies that only single (unique) item was fetched and returns it
+         * wrapped into {@link CompletableFuture}.
+         * <p>
+         * In case fetching failed a meaningful message is returned in {@link CmsServiceException}.
          */
         private class ContentfulCallback extends CDACallback<CDAArray> {
             private final CompletableFuture<Optional<CDAEntry>> future = new CompletableFuture<>();
