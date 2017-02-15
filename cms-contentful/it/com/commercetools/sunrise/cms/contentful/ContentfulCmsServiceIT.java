@@ -25,16 +25,6 @@ public class ContentfulCmsServiceIT {
     private static final String PAGE_TYPE_ID_FIELD_NAME = "slug";
 
     @Test
-    public void whenCouldNotFetchEntry_thenThrowException() throws Exception {
-        CmsService cmsService = ContentfulCmsService.of("", "", PAGE_TYPE_NAME, PAGE_TYPE_ID_FIELD_NAME, Runnable::run);
-
-        Throwable thrown = catchThrowable(() -> waitAndGet(cmsService.page("home", SUPPORTED_LOCALES)));
-
-        assertThat(thrown).isInstanceOf(ExecutionException.class).hasMessageContaining("Could not fetch content for home");
-        assertThat(thrown).hasCauseInstanceOf(CmsServiceException.class);
-    }
-
-    @Test
     public void whenAskForExistingStringContent_thenGet() throws Exception {
         CmsService contentfulCmsService = createService();
 
@@ -68,12 +58,53 @@ public class ContentfulCmsServiceIT {
     }
 
     @Test
-    public void whenAskForExistingStringContentWithNotDefinedLocale_thenReturnEmpty() throws Exception {
+    public void whenNoConfigurationForClientProvided_thenThrowException() throws Exception {
+        CmsService cmsService = ContentfulCmsService.of("", "", PAGE_TYPE_NAME, PAGE_TYPE_ID_FIELD_NAME, Runnable::run);
+
+        Throwable thrown = catchThrowable(() -> waitAndGet(cmsService.page("home", SUPPORTED_LOCALES)));
+
+        assertThat(thrown).isInstanceOf(ExecutionException.class).hasMessageContaining("Could not fetch content for home");
+        assertThat(thrown).hasCauseInstanceOf(CmsServiceException.class);
+    }
+
+    @Test
+    public void whenAskForContentWithLocaleNotDefinedInSpace_thenThrowException() throws Exception {
         CmsService cmsService = createService();
 
-        Optional<CmsPage> content = waitAndGet(cmsService.page("finn", singletonList(Locale.ITALIAN)));
+        Throwable thrown = catchThrowable(() -> waitAndGet(cmsService.page("finn", singletonList(Locale.ITALIAN))));
 
-        assertThat(content).isNotPresent();
+        assertThat(thrown).isInstanceOf(ExecutionException.class).hasMessageContaining("Could not fetch content for finn");
+        assertThat(thrown).hasCauseInstanceOf(CmsServiceException.class);
+    }
+
+    @Test
+    public void whenAskForContentWithNoGivenQueryFieldDefined_thenThrowException() throws Exception {
+        CmsService cmsService = ContentfulCmsService.of(spaceId(), token(), PAGE_TYPE_NAME, "non-existing-field-name", Runnable::run);
+
+        Throwable thrown = catchThrowable(() -> waitAndGet(cmsService.page("finn", singletonList(Locale.ENGLISH))));
+
+        assertThat(thrown).isInstanceOf(ExecutionException.class).hasMessageContaining("Could not fetch content for finn");
+        assertThat(thrown).hasCauseInstanceOf(CmsServiceException.class);
+    }
+
+    @Test
+    public void whenAskForContentForWhichThereIsNoContentTypeDefinedInSpace_thenThrowException() throws Exception {
+        CmsService cmsService = ContentfulCmsService.of(spaceId(), token(), "non-existing-page-type", PAGE_TYPE_ID_FIELD_NAME, Runnable::run);
+
+        Throwable thrown = catchThrowable(() -> waitAndGet(cmsService.page("finn", singletonList(Locale.ENGLISH))));
+
+        assertThat(thrown).isInstanceOf(ExecutionException.class).hasMessageContaining("Could not fetch content for finn");
+        assertThat(thrown).hasCauseInstanceOf(CmsServiceException.class);
+    }
+
+    @Test
+    public void whenAskForNonUniqueContent_thenThrowException() throws Exception {
+        CmsService cmsService = createService();
+
+        Throwable thrown = catchThrowable(() -> waitAndGet(cmsService.page("jacke", SUPPORTED_LOCALES)));
+
+        assertThat(thrown).hasCauseInstanceOf(CmsServiceException.class);
+        assertThat(thrown.getCause()).hasMessage("Non unique identifier used. Result contains more than one page for jacke");
     }
 
     @Test
@@ -88,13 +119,12 @@ public class ContentfulCmsServiceIT {
     }
 
     @Test
-    public void whenAskForNonUniqueContent_thenThrowException() throws Exception {
+    public void whenRequestedPageDoesNotExist_thenReturnEmpty() throws Exception {
         CmsService cmsService = createService();
 
-        Throwable thrown = catchThrowable(() -> waitAndGet(cmsService.page("jacke", SUPPORTED_LOCALES)));
+        Optional<CmsPage> content = waitAndGet(cmsService.page("non-existing-page-key", SUPPORTED_LOCALES));
 
-        assertThat(thrown).hasCauseInstanceOf(CmsServiceException.class);
-        assertThat(thrown.getCause()).hasMessage("Non unique identifier used. Result contains more than one page for jacke");
+        assertThat(content).isNotPresent();
     }
 
     @Test
@@ -204,10 +234,6 @@ public class ContentfulCmsServiceIT {
         assertThat(content).isPresent();
         field = content.get().field("array[3].textArrayField[1]");
         assertThat(field).hasValue("zwei");
-
-        content = waitAndGet(contentfulCmsService.page("finn", singletonList(Locale.ITALIAN)));
-
-        assertThat(content).isNotPresent();
     }
 
     @Test

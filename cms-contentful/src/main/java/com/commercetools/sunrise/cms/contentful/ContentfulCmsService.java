@@ -7,6 +7,7 @@ import com.contentful.java.cda.CDAArray;
 import com.contentful.java.cda.CDACallback;
 import com.contentful.java.cda.CDAClient;
 import com.contentful.java.cda.CDAEntry;
+import com.contentful.java.cda.CDAResource;
 
 import java.util.List;
 import java.util.Locale;
@@ -135,24 +136,21 @@ public class ContentfulCmsService implements CmsService {
 
             @Override
             protected void onSuccess(final CDAArray result) {
-                if (result.items().size() > 1) {
+                List<CDAResource> items = result.items();
+                if (items.isEmpty()) {
+                    future.complete(Optional.empty());
+                } else if (items.size() > 1) {
                     future.completeExceptionally(
                             new CmsServiceException("Non unique identifier used." +
                                     " Result contains more than one page for " + pageKey));
                 } else {
-                    future.complete(Optional.of((CDAEntry) result.items().get(0)));
+                    future.complete(Optional.of((CDAEntry) items.get(0)));
                 }
             }
 
             @Override
             protected void onFailure(final Throwable error) {
-                // check an exception when entry type doesn't exist
-                if (error.getMessage() != null && error.getMessage().contains("code=400")) {
-                    future.complete(Optional.empty());
-                } else {
-                    future.completeExceptionally(
-                            new CmsServiceException("Could not fetch content for " + pageKey, error));
-                }
+                future.completeExceptionally(new CmsServiceException("Could not fetch content for " + pageKey, error));
             }
 
             CompletableFuture<Optional<CDAEntry>> toCompletableFuture() {
