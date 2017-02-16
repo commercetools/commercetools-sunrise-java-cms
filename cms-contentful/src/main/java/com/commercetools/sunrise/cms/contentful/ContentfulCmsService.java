@@ -7,10 +7,14 @@ import com.contentful.java.cda.CDAArray;
 import com.contentful.java.cda.CDACallback;
 import com.contentful.java.cda.CDAClient;
 import com.contentful.java.cda.CDAEntry;
+import com.contentful.java.cda.CDALocale;
 import com.contentful.java.cda.CDAResource;
+import org.apache.commons.lang3.StringUtils;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
@@ -140,9 +144,8 @@ public class ContentfulCmsService implements CmsService {
                 if (items.isEmpty()) {
                     future.complete(Optional.empty());
                 } else if (items.size() > 1) {
-                    future.completeExceptionally(
-                            new CmsServiceException("Non unique identifier used." +
-                                    " Result contains more than one page for " + pageKey));
+                    completeExceptionally("Non unique identifier used. Result contains more than one page for "
+                            + pageKey, null);
                 } else {
                     future.complete(Optional.of((CDAEntry) items.get(0)));
                 }
@@ -150,7 +153,30 @@ public class ContentfulCmsService implements CmsService {
 
             @Override
             protected void onFailure(final Throwable error) {
-                future.completeExceptionally(new CmsServiceException("Could not fetch content for " + pageKey, error));
+                try {
+                    if (StringUtils.contains(error.getMessage(), "code=400") && localeNotInSpace()) {
+                        // Contentful responds with HTTP Bad Request (400) in several cases one of which is
+                        // when trying to fetch page for locale that is not configured in the space.
+                        // In that case detailed message is provided. All other errors are consequence of wrong
+                        // configuration of connection to Contentful or requested space (e.g. content type is not there).
+                        completeExceptionally("Requested locale " + locale + " is not defined on CMS. "
+                                + "Could not fetch content for " + pageKey, error);
+                    } else {
+                        completeExceptionally("Could not fetch content for " + pageKey, error);
+                    }
+                } catch (IOException e) {
+                    completeExceptionally("Could not fetch content for " + pageKey, error);
+                }
+            }
+
+            void completeExceptionally(String message, Throwable cause) {
+                future.completeExceptionally(new CmsServiceException(message, cause));
+            }
+
+            boolean localeNotInSpace() throws IOException {
+                List<CDALocale> contentfulLocales = client.fetchSpace().locales();
+                return contentfulLocales.stream()
+                        .noneMatch(cdaLocale -> Objects.equals(cdaLocale.code(), locale));
             }
 
             CompletableFuture<Optional<CDAEntry>> toCompletableFuture() {

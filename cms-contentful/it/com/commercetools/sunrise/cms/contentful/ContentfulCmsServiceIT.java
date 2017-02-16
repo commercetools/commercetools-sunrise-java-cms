@@ -73,7 +73,7 @@ public class ContentfulCmsServiceIT {
 
         Throwable thrown = catchThrowable(() -> waitAndGet(cmsService.page("finn", singletonList(Locale.ITALIAN))));
 
-        assertThat(thrown).isInstanceOf(ExecutionException.class).hasMessageContaining("Could not fetch content for finn");
+        assertThat(thrown).isInstanceOf(ExecutionException.class).hasMessage("com.commercetools.sunrise.cms.CmsServiceException: Requested locale it is not defined on CMS. Could not fetch content for finn");
         assertThat(thrown).hasCauseInstanceOf(CmsServiceException.class);
     }
 
