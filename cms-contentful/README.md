@@ -3,7 +3,8 @@ Sunrise Java Contentful CMS
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.commercetools.sunrise.cms/cms-api/badge.svg)](http://search.maven.org/#search|gav|1|g:"com.commercetools.sunrise.cms"%20AND%20a:"cms-contentful")
 
-Module for [Sunrise Java](https://github.com/sphereio/commercetools-sunrise-java) with Contentful service. 
+Module for [Sunrise Java](https://github.com/sphereio/commercetools-sunrise-java)
+that serves as an adapter for Contentful CMS platform providing read access to its content.
 
 ## Content model
 
@@ -14,11 +15,6 @@ Wrapper entry type should contain two fields - one entry field of type 'symbol' 
 for identifying page entry, and one entry field of type 'reference', which points to
 right entry page.
 
-## Installation
-If you are using a Sunrise-based project, just add the following dependency:
-```
-libraryDependencies += "com.commercetools.sunrise.cms" % "cms-contentful" % "0.1.0"
-```
 
 ## How to use it
 
