@@ -6,31 +6,56 @@ Sunrise Java Contentful CMS
 Module for [Sunrise Java](https://github.com/sphereio/commercetools-sunrise-java)
 that serves as an adapter for Contentful CMS platform providing read access to its content.
 
-## Content model
+##Configuration
 
-The best way to use Sunrise Java Contentful CMS is to use it in common with following content model:
-* every page should have it's separate entry (page entry) with only required fields.
-* every page entry should belong to separate wrapper entry.
-Wrapper entry type should contain two fields - one entry field of type 'symbol' (short text)
-for identifying page entry, and one entry field of type 'reference', which points to
-right entry page.
+In order to create a new instance of `ContentfulCmsService` following parameters needs to be provided:
 
+param | description
+----- | -----------
+spaceId | Contentful space ID
+token | access token to given space
+pageType | Contentful model's content type
+pageQueryField | a field defined in `pageType`
+callbackExecutor | defines execution context in which requests are executed
 
-## How to use it
+```Java
+ContentfulCmsService.of("spaceId", "token", "pageType", "pageQueryField", callbackExecutor);
+```
 
-To implement Contentful data into sunrise project, 
-one need to create ContentfulCmsService object using API token, space id 
-along with information about wrapper entry: name of it's type (pageTypeName),
-and id field (pageTypeIdFieldName).
+Instance of the service is created per Contentful page type and one of this type's fields upon which queries will
+be executed.
 
-`ContentfulCmsService.of("spaceId", "token", "pageTypeName", "pageTypeIdFieldName");`
+Contentful's JVM executor is synchronous and for that reason this service is built with additional `Executor`
+parameter to provide its user with control over execution context in which requests are executed.
 
-For retrieving content for the whole page use:
-`cmsService.page("pageKey", localesList);`,
-where 'pageKey' is the value of identifying field.
+##Localization
 
-Currently this module doesn't support "Location" entry type,
-neither array types(array of text fields, media fields, list of entries).
-Every other values are achievable using `CmsPage` method `Optional<String> field(final String fieldName);` 
-where `fieldName` is a path to correct field.
-E.g. `banner.image.url`. Separated values are ids of succeeding entry fields.
+Contentful provides its users with localization facilities. Several locales might be defined for given space.
+This adapter might be used to request a page with empty locales list. In such situation implementation makes such
+request locale-independent. Contentful uses space's default locale in this case.
+
+##Supported field types
+
+Contentful provides several field types. This implementation serves following of them:
+
+* Boolean
+* Date
+* Integer
+* Number
+* Symbol
+* Text
+* Location
+* Asset
+* Array
+
+Note that `Asset` field is converted to string in a special way. It is done by getting contained `url`.
+Fields of all other types are just converted by their `toString()` method.
+
+`Array` type is not representable as string. Fields of that type can only be used to access contained items.
+
+##Error handling
+
+Content should be uniquely identified by chosen field. If there is more than one entity of chosen type with the same query field Contentful will return all of them but this service execution will result in `CompletableFuture` completed exceptionally by throwing `CmsServiceException` informing about non-unique identifier used.
+
+If content is requested for a specific locale that is not defined for the space this implementation will respond
+with 'CmsServiceException' with adequate message.
