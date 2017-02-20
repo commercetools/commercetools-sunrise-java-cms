@@ -34,13 +34,10 @@ a path. It constitutes a single string-representable piece of content
 that can be accessed using this API.
 
 An entry is an independent identifiable piece of content that can be requested by this service as a page.
-In the repository it can be nested inside other entries or arrays to form more complex trees of context.
+In the repository it can be nested inside other entries or arrays to form more complex trees of content.
 
-An array, non-identifiable in itself and thus can't be fetched as a page. Can be nested inside entries
-with identifiers or other arrays. Provides index-based access to it's items.
+An array, non-identifiable in itself and thus can't be fetched as a page. Can be nested inside entries. Provides index-based access to it's items.
 Depending on content model array item might be a directly retrievable field or an entry.
-
-###Path
 
 A path is a field identifier in the scope of given page.
 Because of hierarchical structure of underlying content this identifier
@@ -91,8 +88,6 @@ path | reason of failure
 `array1[0].nonExistingField` | no such field
 
 Empty result is returned for all of those paths.
-
-Note the difference between accessing content inside an entry and array.
 
 When service is requested to fetch page `entry2` the only correct paths are: `textField1` and `imageAssetField2` as there are no other fields or entries in this subtree.
 
