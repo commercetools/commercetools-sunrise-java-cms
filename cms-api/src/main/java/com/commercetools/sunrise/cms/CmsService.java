@@ -8,6 +8,7 @@ import java.util.concurrent.CompletionStage;
 /**
  * A service providing access to CMS pages.
  */
+@FunctionalInterface
 public interface CmsService {
 
     /**
@@ -21,6 +22,6 @@ public interface CmsService {
      * @param locales list of locales for which the content is expected to be defined
      * @return requested page or empty result
      */
-    CompletionStage<Optional<CmsPage>> page(final String pageKey, final List<Locale> locales);
+    CompletionStage<Optional<CmsPage>> page(String pageKey, List<Locale> locales);
 
 }

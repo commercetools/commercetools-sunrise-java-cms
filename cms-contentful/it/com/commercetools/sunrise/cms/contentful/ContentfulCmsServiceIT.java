@@ -23,6 +23,8 @@ public class ContentfulCmsServiceIT {
 
     private static final String PAGE_TYPE_NAME = "page";
     private static final String PAGE_TYPE_ID_FIELD_NAME = "slug";
+    private static final String CONTENTFUL_SPACE_ID = "CONTENTFUL_SPACE_ID";
+    private static final String CONTENTFUL_TOKEN = "CONTENTFUL_TOKEN";
 
     @Test
     public void whenAskForExistingStringContent_thenGet() throws Exception {
@@ -256,19 +258,19 @@ public class ContentfulCmsServiceIT {
     }
 
     private static String spaceId() {
-        return getValueForEnvVar("CONTENTFUL_SPACE_ID");
+        return getValueForEnvVar(CONTENTFUL_SPACE_ID);
     }
 
     private static String token() {
-        return getValueForEnvVar("CONTENTFUL_TOKEN");
+        return getValueForEnvVar(CONTENTFUL_TOKEN);
     }
 
     private static String getValueForEnvVar(final String key) {
         return Optional.ofNullable(System.getenv(key))
                 .orElseThrow(() -> new RuntimeException(
                         "Missing environment variable " + key + ", please provide the following environment variables for the integration test:\n" +
-                                "export " + "CONTENTFUL_SPACE_ID" + "=\"Your Contentful project key\"\n" +
-                                "export " + "CONTENTFUL_TOKEN" + "=\"Your Contentful authentication token\"\n"));
+                                "export " + CONTENTFUL_SPACE_ID + "=\"Your Contentful project key\"\n" +
+                                "export " + CONTENTFUL_TOKEN + "=\"Your Contentful authentication token\"\n"));
     }
 
 }

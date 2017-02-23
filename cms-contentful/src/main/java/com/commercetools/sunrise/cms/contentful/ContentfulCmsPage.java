@@ -174,7 +174,7 @@ public class ContentfulCmsPage implements CmsPage {
      * Find content type of an entry and validate if it's supported by this implementation.
      */
     private Optional<CDAField> findContentTypeField(final CDAEntry entry, final String fieldKey,
-                                                    boolean arrayExpected) {
+                                                    final boolean arrayExpected) {
         return entry.contentType().fields().stream()
                 .filter(field -> field.id().equals(fieldKey))
                 .filter(field -> arrayExpected == isArray(field))

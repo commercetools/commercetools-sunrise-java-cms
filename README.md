@@ -13,6 +13,11 @@ Choose the CMS adapter and follow its installation instructions:
 
 - [Contentful Sunrise Adapter](/cms-contentful)
 
+Note that if you are not using a Sunrise-based project, you'll additionally need to use as dependency:
+```
+libraryDependencies += "com.commercetools.sunrise.cms" % "cms-api" % "0.1.0"
+```
+
 ##Architecture
 
 This API consists of five abstractions that reflect CMS hierarchical content structure:
@@ -101,6 +106,6 @@ When service is requested to fetch page `entry2` the only correct paths are: `te
 ##Locale
 
 Underlying repository might provide localization of content. To leverage that this service can provide a page
-for the list of locales. The first locale on the list is matched against the repository contet.
+for the list of locales. The first locale on the list is matched against the repository content.
 If it's missing the second one is matched and so forth. An empty list can be provided and the behavior is 
 dependent on underlying implementation.

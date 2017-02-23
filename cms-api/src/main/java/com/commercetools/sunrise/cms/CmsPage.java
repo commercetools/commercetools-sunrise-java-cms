@@ -50,7 +50,7 @@ public interface CmsPage {
      * @param path identifying the field (e.g. banner[2].image[2])
      * @return content of node identified by the path, or empty string if not found
      */
-    default String fieldOrEmpty(String path) {
+    default String fieldOrEmpty(final String path) {
         return field(path).orElse("");
     }
 }

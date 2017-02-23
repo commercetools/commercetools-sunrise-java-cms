@@ -39,7 +39,8 @@ public class ContentfulCmsService implements CmsService {
     private final String pageQueryField;
     private final Executor callbackExecutor;
 
-    private ContentfulCmsService(CDAClient client, String pageType, String pageQueryField, Executor callbackExecutor) {
+    private ContentfulCmsService(final CDAClient client, final String pageType, final String pageQueryField,
+                                 final Executor callbackExecutor) {
         this.client = client;
         this.pageType = pageType;
         this.pageQueryField = "fields." + pageQueryField;
@@ -70,7 +71,7 @@ public class ContentfulCmsService implements CmsService {
      * @param locales list of locales with only first one relevant for Contentful
      * @return string representation of requested locale adjusted for Contentful
      */
-    private String getLocaleForContentful(List<Locale> locales) {
+    private String getLocaleForContentful(final List<Locale> locales) {
         return locales.isEmpty() ? "*" : locales.get(0).toLanguageTag();
     }
 
@@ -88,12 +89,12 @@ public class ContentfulCmsService implements CmsService {
      * @param callbackExecutor defines execution context in which requests are executed
      * @return instance of this service ready to serve content based on given configuration
      */
-    public static ContentfulCmsService of(String spaceId, String token, String pageType, String pageQueryField,
-                                          Executor callbackExecutor) {
+    public static ContentfulCmsService of(final String spaceId, final String token, final String pageType,
+                                          final String pageQueryField, final Executor callbackExecutor) {
         return new ContentfulCmsService(createClient(spaceId, token), pageType, pageQueryField, callbackExecutor);
     }
 
-    private static CDAClient createClient(String spaceId, String token) {
+    private static CDAClient createClient(final String spaceId, final String token) {
         return CDAClient.builder()
                 .setSpace(spaceId)
                 .setToken(token)
@@ -108,7 +109,7 @@ public class ContentfulCmsService implements CmsService {
         private final String pageKey;
         private final String locale;
 
-        ContentCallback(String pageKey, String locale) {
+        ContentCallback(final String pageKey, final String locale) {
             this.pageKey = pageKey;
             this.locale = locale;
         }
@@ -169,7 +170,7 @@ public class ContentfulCmsService implements CmsService {
                 }
             }
 
-            void completeExceptionally(String message, Throwable cause) {
+            void completeExceptionally(final String message, final Throwable cause) {
                 future.completeExceptionally(new CmsServiceException(message, cause));
             }
 

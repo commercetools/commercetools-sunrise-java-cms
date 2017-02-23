@@ -45,7 +45,7 @@ enum FieldType {
     private final String type;
     private final boolean hasStringRepresentation;
 
-    FieldType(String type, boolean hasStringRepresentation) {
+    FieldType(final String type, final boolean hasStringRepresentation) {
         this.type = type;
         this.hasStringRepresentation = hasStringRepresentation;
     }
