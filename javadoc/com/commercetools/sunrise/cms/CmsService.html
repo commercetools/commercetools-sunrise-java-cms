@@ -109,7 +109,7 @@ var activeTableTab = "activeTableTab";
 <br>
 <pre>@FunctionalInterface
 public interface <span class="typeNameLabel">CmsService</span></pre>
-<div class="block">Service that provides page content, coming from some sort of Content Management System (CMS).</div>
+<div class="block">A service providing access to CMS pages.</div>
 </li>
 </ul>
 </div>
@@ -132,7 +132,8 @@ public interface <span class="typeNameLabel">CmsService</span></pre>
 <td class="colFirst"><code>java.util.concurrent.CompletionStage&lt;java.util.Optional&lt;<a href="../../../../com/commercetools/sunrise/cms/CmsPage.html" title="interface in com.commercetools.sunrise.cms">CmsPage</a>&gt;&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../com/commercetools/sunrise/cms/CmsService.html#page-java.lang.String-java.util.List-">page</a></span>(java.lang.String&nbsp;pageKey,
     java.util.List&lt;java.util.Locale&gt;&nbsp;locales)</code>
-<div class="block">Gets the page content corresponding to the given key.</div>
+<div class="block">Retrieves the page identified by the given key for any of the provided locales trying to match the first
+ on the list that the content is defined for.</div>
 </td>
 </tr>
 </table>
@@ -158,13 +159,17 @@ public interface <span class="typeNameLabel">CmsService</span></pre>
 <h4>page</h4>
 <pre>java.util.concurrent.CompletionStage&lt;java.util.Optional&lt;<a href="../../../../com/commercetools/sunrise/cms/CmsPage.html" title="interface in com.commercetools.sunrise.cms">CmsPage</a>&gt;&gt;&nbsp;page(java.lang.String&nbsp;pageKey,
                                                                        java.util.List&lt;java.util.Locale&gt;&nbsp;locales)</pre>
-<div class="block">Gets the page content corresponding to the given key.</div>
+<div class="block">Retrieves the page identified by the given key for any of the provided locales trying to match the first
+ on the list that the content is defined for.
+ <p>
+ Depending on implementation and CMS provider if requested page is not defined for any of requested locales
+ an empty result might be returned or configured default locale might be used.</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>pageKey</code> - identifying the page</dd>
-<dd><code>locales</code> - for the localized content inside the page</dd>
+<dd><code>pageKey</code> - identifier of the page</dd>
+<dd><code>locales</code> - list of locales for which the content is expected to be defined</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>a <code>CompletionStage</code> containing the page content identified by the key</dd>
+<dd>requested page or empty result</dd>
 </dl>
 </li>
 </ul>

@@ -67,16 +67,18 @@
 <!--   -->
 </a></div>
 <!-- ========= END OF TOP NAVBAR ========= -->
-<div class="contentContainer"><a href="#I:C">C</a>&nbsp;<a href="#I:F">F</a>&nbsp;<a href="#I:O">O</a>&nbsp;<a href="#I:P">P</a>&nbsp;<a href="#I:T">T</a>&nbsp;<a href="#I:V">V</a>&nbsp;<a name="I:C">
+<div class="contentContainer"><a href="#I:C">C</a>&nbsp;<a href="#I:F">F</a>&nbsp;<a href="#I:O">O</a>&nbsp;<a href="#I:P">P</a>&nbsp;<a name="I:C">
 <!--   -->
 </a>
 <h2 class="title">C</h2>
 <dl>
 <dt><a href="com/commercetools/sunrise/cms/CmsPage.html" title="interface in com.commercetools.sunrise.cms"><span class="typeNameLink">CmsPage</span></a> - Interface in <a href="com/commercetools/sunrise/cms/package-summary.html">com.commercetools.sunrise.cms</a></dt>
-<dd>&nbsp;</dd>
+<dd>
+<div class="block">A hierarchical read-only collection of cms nodes that provides access to their string representations.</div>
+</dd>
 <dt><a href="com/commercetools/sunrise/cms/CmsService.html" title="interface in com.commercetools.sunrise.cms"><span class="typeNameLink">CmsService</span></a> - Interface in <a href="com/commercetools/sunrise/cms/package-summary.html">com.commercetools.sunrise.cms</a></dt>
 <dd>
-<div class="block">Service that provides page content, coming from some sort of Content Management System (CMS).</div>
+<div class="block">A service providing access to CMS pages.</div>
 </dd>
 <dt><a href="com/commercetools/sunrise/cms/CmsServiceException.html" title="class in com.commercetools.sunrise.cms"><span class="typeNameLink">CmsServiceException</span></a> - Exception in <a href="com/commercetools/sunrise/cms/package-summary.html">com.commercetools.sunrise.cms</a></dt>
 <dd>
@@ -84,21 +86,19 @@
 </dd>
 <dt><span class="memberNameLink"><a href="com/commercetools/sunrise/cms/CmsServiceException.html#CmsServiceException-java.lang.String-java.lang.Throwable-">CmsServiceException(String, Throwable)</a></span> - Constructor for exception com.commercetools.sunrise.cms.<a href="com/commercetools/sunrise/cms/CmsServiceException.html" title="class in com.commercetools.sunrise.cms">CmsServiceException</a></dt>
 <dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/commercetools/sunrise/cms/CmsServiceException.html#CmsServiceException-java.lang.Throwable-">CmsServiceException(Throwable)</a></span> - Constructor for exception com.commercetools.sunrise.cms.<a href="com/commercetools/sunrise/cms/CmsServiceException.html" title="class in com.commercetools.sunrise.cms">CmsServiceException</a></dt>
-<dd>&nbsp;</dd>
 <dt><a href="com/commercetools/sunrise/cms/package-summary.html">com.commercetools.sunrise.cms</a> - package com.commercetools.sunrise.cms</dt>
 <dd>&nbsp;</dd>
 <dt><a href="com/commercetools/sunrise/cms/contentful/package-summary.html">com.commercetools.sunrise.cms.contentful</a> - package com.commercetools.sunrise.cms.contentful</dt>
 <dd>&nbsp;</dd>
-<dt><a href="com/commercetools/sunrise/cms/contentful/models/package-summary.html">com.commercetools.sunrise.cms.contentful.models</a> - package com.commercetools.sunrise.cms.contentful.models</dt>
-<dd>&nbsp;</dd>
 <dt><a href="com/commercetools/sunrise/cms/contentful/ContentfulCmsPage.html" title="class in com.commercetools.sunrise.cms.contentful"><span class="typeNameLink">ContentfulCmsPage</span></a> - Class in <a href="com/commercetools/sunrise/cms/contentful/package-summary.html">com.commercetools.sunrise.cms.contentful</a></dt>
-<dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/commercetools/sunrise/cms/contentful/ContentfulCmsPage.html#ContentfulCmsPage-com.contentful.java.cda.CDAEntry-java.util.List-">ContentfulCmsPage(CDAEntry, List&lt;Locale&gt;)</a></span> - Constructor for class com.commercetools.sunrise.cms.contentful.<a href="com/commercetools/sunrise/cms/contentful/ContentfulCmsPage.html" title="class in com.commercetools.sunrise.cms.contentful">ContentfulCmsPage</a></dt>
+<dd>
+<div class="block">Immutable representation of CMS retrieved from Contentful platform.</div>
+</dd>
+<dt><span class="memberNameLink"><a href="com/commercetools/sunrise/cms/contentful/ContentfulCmsPage.html#ContentfulCmsPage-com.contentful.java.cda.CDAEntry-">ContentfulCmsPage(CDAEntry)</a></span> - Constructor for class com.commercetools.sunrise.cms.contentful.<a href="com/commercetools/sunrise/cms/contentful/ContentfulCmsPage.html" title="class in com.commercetools.sunrise.cms.contentful">ContentfulCmsPage</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="com/commercetools/sunrise/cms/contentful/ContentfulCmsService.html" title="class in com.commercetools.sunrise.cms.contentful"><span class="typeNameLink">ContentfulCmsService</span></a> - Class in <a href="com/commercetools/sunrise/cms/contentful/package-summary.html">com.commercetools.sunrise.cms.contentful</a></dt>
 <dd>
-<div class="block">Service that provides page content, coming from Contentful.</div>
+<div class="block">Service providing access to CMS pages from Contentful platform.</div>
 </dd>
 </dl>
 <a name="I:F">
@@ -108,25 +108,23 @@
 <dl>
 <dt><span class="memberNameLink"><a href="com/commercetools/sunrise/cms/CmsPage.html#field-java.lang.String-">field(String)</a></span> - Method in interface com.commercetools.sunrise.cms.<a href="com/commercetools/sunrise/cms/CmsPage.html" title="interface in com.commercetools.sunrise.cms">CmsPage</a></dt>
 <dd>
-<div class="block">Gets the content corresponding to the given field name.</div>
+<div class="block">Get string representation of the content of cms node identified by the given path.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/commercetools/sunrise/cms/contentful/ContentfulCmsPage.html#field-java.lang.String-">field(String)</a></span> - Method in class com.commercetools.sunrise.cms.contentful.<a href="com/commercetools/sunrise/cms/contentful/ContentfulCmsPage.html" title="class in com.commercetools.sunrise.cms.contentful">ContentfulCmsPage</a></dt>
 <dd>&nbsp;</dd>
 <dt><span class="memberNameLink"><a href="com/commercetools/sunrise/cms/CmsPage.html#fieldOrEmpty-java.lang.String-">fieldOrEmpty(String)</a></span> - Method in interface com.commercetools.sunrise.cms.<a href="com/commercetools/sunrise/cms/CmsPage.html" title="interface in com.commercetools.sunrise.cms">CmsPage</a></dt>
 <dd>
-<div class="block">Gets the content corresponding to the given field name.</div>
+<div class="block">Get string representation of the content of cms node identified by the given path or empty string if not found.</div>
 </dd>
-<dt><a href="com/commercetools/sunrise/cms/contentful/models/FieldType.html" title="enum in com.commercetools.sunrise.cms.contentful.models"><span class="typeNameLink">FieldType</span></a> - Enum in <a href="com/commercetools/sunrise/cms/contentful/models/package-summary.html">com.commercetools.sunrise.cms.contentful.models</a></dt>
-<dd>&nbsp;</dd>
 </dl>
 <a name="I:O">
 <!--   -->
 </a>
 <h2 class="title">O</h2>
 <dl>
-<dt><span class="memberNameLink"><a href="com/commercetools/sunrise/cms/contentful/ContentfulCmsService.html#of-java.lang.String-java.lang.String-java.lang.String-java.lang.String-">of(String, String, String, String)</a></span> - Static method in class com.commercetools.sunrise.cms.contentful.<a href="com/commercetools/sunrise/cms/contentful/ContentfulCmsService.html" title="class in com.commercetools.sunrise.cms.contentful">ContentfulCmsService</a></dt>
+<dt><span class="memberNameLink"><a href="com/commercetools/sunrise/cms/contentful/ContentfulCmsService.html#of-java.lang.String-java.lang.String-java.lang.String-java.lang.String-java.util.concurrent.Executor-">of(String, String, String, String, Executor)</a></span> - Static method in class com.commercetools.sunrise.cms.contentful.<a href="com/commercetools/sunrise/cms/contentful/ContentfulCmsService.html" title="class in com.commercetools.sunrise.cms.contentful">ContentfulCmsService</a></dt>
 <dd>
-<div class="block">Creates new instance of ContentfulCmsService based on Contentful account credentials</div>
+<div class="block">Create new instance of <a href="com/commercetools/sunrise/cms/contentful/ContentfulCmsService.html" title="class in com.commercetools.sunrise.cms.contentful"><code>ContentfulCmsService</code></a> based on Contentful account credentials.</div>
 </dd>
 </dl>
 <a name="I:P">
@@ -136,39 +134,15 @@
 <dl>
 <dt><span class="memberNameLink"><a href="com/commercetools/sunrise/cms/CmsService.html#page-java.lang.String-java.util.List-">page(String, List&lt;Locale&gt;)</a></span> - Method in interface com.commercetools.sunrise.cms.<a href="com/commercetools/sunrise/cms/CmsService.html" title="interface in com.commercetools.sunrise.cms">CmsService</a></dt>
 <dd>
-<div class="block">Gets the page content corresponding to the given key.</div>
+<div class="block">Retrieves the page identified by the given key for any of the provided locales trying to match the first
+ on the list that the content is defined for.</div>
 </dd>
 <dt><span class="memberNameLink"><a href="com/commercetools/sunrise/cms/contentful/ContentfulCmsService.html#page-java.lang.String-java.util.List-">page(String, List&lt;Locale&gt;)</a></span> - Method in class com.commercetools.sunrise.cms.contentful.<a href="com/commercetools/sunrise/cms/contentful/ContentfulCmsService.html" title="class in com.commercetools.sunrise.cms.contentful">ContentfulCmsService</a></dt>
 <dd>
-<div class="block">Gets the page content corresponding to the given key.</div>
+<div class="block">Get the page content corresponding to the given key.</div>
 </dd>
 </dl>
-<a name="I:T">
-<!--   -->
-</a>
-<h2 class="title">T</h2>
-<dl>
-<dt><span class="memberNameLink"><a href="com/commercetools/sunrise/cms/contentful/models/FieldType.html#toStringStrategy-com.contentful.java.cda.CDAField-">toStringStrategy(CDAField)</a></span> - Static method in enum com.commercetools.sunrise.cms.contentful.models.<a href="com/commercetools/sunrise/cms/contentful/models/FieldType.html" title="enum in com.commercetools.sunrise.cms.contentful.models">FieldType</a></dt>
-<dd>&nbsp;</dd>
-<dt><span class="memberNameLink"><a href="com/commercetools/sunrise/cms/contentful/models/FieldType.html#type--">type()</a></span> - Method in enum com.commercetools.sunrise.cms.contentful.models.<a href="com/commercetools/sunrise/cms/contentful/models/FieldType.html" title="enum in com.commercetools.sunrise.cms.contentful.models">FieldType</a></dt>
-<dd>&nbsp;</dd>
-</dl>
-<a name="I:V">
-<!--   -->
-</a>
-<h2 class="title">V</h2>
-<dl>
-<dt><span class="memberNameLink"><a href="com/commercetools/sunrise/cms/contentful/models/FieldType.html#valueOf-java.lang.String-">valueOf(String)</a></span> - Static method in enum com.commercetools.sunrise.cms.contentful.models.<a href="com/commercetools/sunrise/cms/contentful/models/FieldType.html" title="enum in com.commercetools.sunrise.cms.contentful.models">FieldType</a></dt>
-<dd>
-<div class="block">Returns the enum constant of this type with the specified name.</div>
-</dd>
-<dt><span class="memberNameLink"><a href="com/commercetools/sunrise/cms/contentful/models/FieldType.html#values--">values()</a></span> - Static method in enum com.commercetools.sunrise.cms.contentful.models.<a href="com/commercetools/sunrise/cms/contentful/models/FieldType.html" title="enum in com.commercetools.sunrise.cms.contentful.models">FieldType</a></dt>
-<dd>
-<div class="block">Returns an array containing the constants of this enum type, in
-the order they are declared.</div>
-</dd>
-</dl>
-<a href="#I:C">C</a>&nbsp;<a href="#I:F">F</a>&nbsp;<a href="#I:O">O</a>&nbsp;<a href="#I:P">P</a>&nbsp;<a href="#I:T">T</a>&nbsp;<a href="#I:V">V</a>&nbsp;</div>
+<a href="#I:C">C</a>&nbsp;<a href="#I:F">F</a>&nbsp;<a href="#I:O">O</a>&nbsp;<a href="#I:P">P</a>&nbsp;</div>
 <!-- ======= START OF BOTTOM NAVBAR ====== -->
 <div class="bottomNav"><a name="navbar.bottom">
 <!--   -->

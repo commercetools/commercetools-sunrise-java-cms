@@ -114,7 +114,16 @@ var activeTableTab = "activeTableTab";
 <pre>public class <span class="typeNameLabel">ContentfulCmsService</span>
 extends java.lang.Object
 implements <a href="../../../../../com/commercetools/sunrise/cms/CmsService.html" title="interface in com.commercetools.sunrise.cms">CmsService</a></pre>
-<div class="block">Service that provides page content, coming from Contentful.</div>
+<div class="block">Service providing access to CMS pages from Contentful platform.
+ <p>
+ Instance of the service is created per Contentful page type and one of this type's fields upon which query will
+ be executed. A consequence of that is that content should be uniquely identified by chosen field. If there is more
+ than one entity of chosen type with the same query field Contentful will return all of them but this service
+ will result in <code>CompletableFuture</code> completed by throwing <a href="../../../../../com/commercetools/sunrise/cms/CmsServiceException.html" title="class in com.commercetools.sunrise.cms"><code>CmsServiceException</code></a>
+ informing about non-unique identifier used.
+ <p>
+ Contentful's JVM executor is synchronous and for that reason this service is built with additional <code>Executor</code>
+ parameter to provide its user with control over execution context in which requests are executed.</div>
 </li>
 </ul>
 </div>
@@ -135,18 +144,19 @@ implements <a href="../../../../../com/commercetools/sunrise/cms/CmsService.html
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>static <a href="../../../../../com/commercetools/sunrise/cms/contentful/ContentfulCmsService.html" title="class in com.commercetools.sunrise.cms.contentful">ContentfulCmsService</a></code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/commercetools/sunrise/cms/contentful/ContentfulCmsService.html#of-java.lang.String-java.lang.String-java.lang.String-java.lang.String-">of</a></span>(java.lang.String&nbsp;spaceId,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/commercetools/sunrise/cms/contentful/ContentfulCmsService.html#of-java.lang.String-java.lang.String-java.lang.String-java.lang.String-java.util.concurrent.Executor-">of</a></span>(java.lang.String&nbsp;spaceId,
   java.lang.String&nbsp;token,
-  java.lang.String&nbsp;pageTypeName,
-  java.lang.String&nbsp;pageTypeIdFieldName)</code>
-<div class="block">Creates new instance of ContentfulCmsService based on Contentful account credentials</div>
+  java.lang.String&nbsp;pageType,
+  java.lang.String&nbsp;pageQueryField,
+  java.util.concurrent.Executor&nbsp;callbackExecutor)</code>
+<div class="block">Create new instance of <a href="../../../../../com/commercetools/sunrise/cms/contentful/ContentfulCmsService.html" title="class in com.commercetools.sunrise.cms.contentful"><code>ContentfulCmsService</code></a> based on Contentful account credentials.</div>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>java.util.concurrent.CompletionStage&lt;java.util.Optional&lt;<a href="../../../../../com/commercetools/sunrise/cms/CmsPage.html" title="interface in com.commercetools.sunrise.cms">CmsPage</a>&gt;&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/commercetools/sunrise/cms/contentful/ContentfulCmsService.html#page-java.lang.String-java.util.List-">page</a></span>(java.lang.String&nbsp;pageKey,
     java.util.List&lt;java.util.Locale&gt;&nbsp;locales)</code>
-<div class="block">Gets the page content corresponding to the given key.</div>
+<div class="block">Get the page content corresponding to the given key.</div>
 </td>
 </tr>
 </table>
@@ -179,7 +189,7 @@ implements <a href="../../../../../com/commercetools/sunrise/cms/CmsService.html
 <h4>page</h4>
 <pre>public&nbsp;java.util.concurrent.CompletionStage&lt;java.util.Optional&lt;<a href="../../../../../com/commercetools/sunrise/cms/CmsPage.html" title="interface in com.commercetools.sunrise.cms">CmsPage</a>&gt;&gt;&nbsp;page(java.lang.String&nbsp;pageKey,
                                                                               java.util.List&lt;java.util.Locale&gt;&nbsp;locales)</pre>
-<div class="block">Gets the page content corresponding to the given key.</div>
+<div class="block">Get the page content corresponding to the given key.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="../../../../../com/commercetools/sunrise/cms/CmsService.html#page-java.lang.String-java.util.List-">page</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../com/commercetools/sunrise/cms/CmsService.html" title="interface in com.commercetools.sunrise.cms">CmsService</a></code></dd>
@@ -189,11 +199,11 @@ implements <a href="../../../../../com/commercetools/sunrise/cms/CmsService.html
 <dt><span class="returnLabel">Returns:</span></dt>
 <dd>a <code>CompletionStage</code> containing the page content identified by the key,
  or absent if it could not be found, or a <a href="../../../../../com/commercetools/sunrise/cms/CmsServiceException.html" title="class in com.commercetools.sunrise.cms"><code>CmsServiceException</code></a> if there was a problem
- when obtaining the content from Contentful.</dd>
+ when obtaining content</dd>
 </dl>
 </li>
 </ul>
-<a name="of-java.lang.String-java.lang.String-java.lang.String-java.lang.String-">
+<a name="of-java.lang.String-java.lang.String-java.lang.String-java.lang.String-java.util.concurrent.Executor-">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -201,9 +211,20 @@ implements <a href="../../../../../com/commercetools/sunrise/cms/CmsService.html
 <h4>of</h4>
 <pre>public static&nbsp;<a href="../../../../../com/commercetools/sunrise/cms/contentful/ContentfulCmsService.html" title="class in com.commercetools.sunrise.cms.contentful">ContentfulCmsService</a>&nbsp;of(java.lang.String&nbsp;spaceId,
                                       java.lang.String&nbsp;token,
-                                      java.lang.String&nbsp;pageTypeName,
-                                      java.lang.String&nbsp;pageTypeIdFieldName)</pre>
-<div class="block">Creates new instance of ContentfulCmsService based on Contentful account credentials</div>
+                                      java.lang.String&nbsp;pageType,
+                                      java.lang.String&nbsp;pageQueryField,
+                                      java.util.concurrent.Executor&nbsp;callbackExecutor)</pre>
+<div class="block">Create new instance of <a href="../../../../../com/commercetools/sunrise/cms/contentful/ContentfulCmsService.html" title="class in com.commercetools.sunrise.cms.contentful"><code>ContentfulCmsService</code></a> based on Contentful account credentials.</div>
+<dl>
+<dt><span class="paramLabel">Parameters:</span></dt>
+<dd><code>spaceId</code> - Contentful space ID</dd>
+<dd><code>token</code> - access token to given space</dd>
+<dd><code>pageType</code> - Contentful model's page type to be queried against</dd>
+<dd><code>pageQueryField</code> - pageType field against which query will be run</dd>
+<dd><code>callbackExecutor</code> - defines execution context in which requests are executed</dd>
+<dt><span class="returnLabel">Returns:</span></dt>
+<dd>instance of this service ready to serve content based on given configuration</dd>
+</dl>
 </li>
 </ul>
 </li>

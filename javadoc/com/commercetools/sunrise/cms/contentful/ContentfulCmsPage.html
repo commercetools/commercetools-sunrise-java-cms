@@ -114,6 +114,15 @@ var activeTableTab = "activeTableTab";
 <pre>public class <span class="typeNameLabel">ContentfulCmsPage</span>
 extends java.lang.Object
 implements <a href="../../../../../com/commercetools/sunrise/cms/CmsPage.html" title="interface in com.commercetools.sunrise.cms">CmsPage</a></pre>
+<div class="block">Immutable representation of CMS retrieved from Contentful platform.
+ <p>
+ Object of this class provides access to all fields in the subtree stored in retrieved <code>CDAEntry</code>.
+ <p>
+ In the Contentful CMS realm there is a distinction between <code>CDAEntry</code> and <code>CDAField</code>
+ (or <code>CDAAsset</code>) the latter of which can be retrieved as a String by
+ <a href="../../../../../com/commercetools/sunrise/cms/contentful/ContentfulCmsPage.html#field-java.lang.String-"><code>field(String)</code></a> method.
+ Last path segment (or the first one if there is only one segment) is supposed to match a field which
+ should be representable as a string.</div>
 </li>
 </ul>
 </div>
@@ -132,8 +141,7 @@ implements <a href="../../../../../com/commercetools/sunrise/cms/CmsPage.html" t
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../com/commercetools/sunrise/cms/contentful/ContentfulCmsPage.html#ContentfulCmsPage-com.contentful.java.cda.CDAEntry-java.util.List-">ContentfulCmsPage</a></span>(com.contentful.java.cda.CDAEntry&nbsp;cdaEntry,
-                 java.util.List&lt;java.util.Locale&gt;&nbsp;locales)</code>&nbsp;</td>
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../com/commercetools/sunrise/cms/contentful/ContentfulCmsPage.html#ContentfulCmsPage-com.contentful.java.cda.CDAEntry-">ContentfulCmsPage</a></span>(com.contentful.java.cda.CDAEntry&nbsp;cdaEntry)</code>&nbsp;</td>
 </tr>
 </table>
 </li>
@@ -153,7 +161,7 @@ implements <a href="../../../../../com/commercetools/sunrise/cms/CmsPage.html" t
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>java.util.Optional&lt;java.lang.String&gt;</code></td>
 <td class="colLast"><code><span class="memberNameLink"><a href="../../../../../com/commercetools/sunrise/cms/contentful/ContentfulCmsPage.html#field-java.lang.String-">field</a></span>(java.lang.String&nbsp;path)</code>
-<div class="block">Gets the content corresponding to the given field name.</div>
+<div class="block">Get string representation of the content of cms node identified by the given path.</div>
 </td>
 </tr>
 </table>
@@ -185,14 +193,13 @@ implements <a href="../../../../../com/commercetools/sunrise/cms/CmsPage.html" t
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="ContentfulCmsPage-com.contentful.java.cda.CDAEntry-java.util.List-">
+<a name="ContentfulCmsPage-com.contentful.java.cda.CDAEntry-">
 <!--   -->
 </a>
 <ul class="blockListLast">
 <li class="blockList">
 <h4>ContentfulCmsPage</h4>
-<pre>public&nbsp;ContentfulCmsPage(com.contentful.java.cda.CDAEntry&nbsp;cdaEntry,
-                         java.util.List&lt;java.util.Locale&gt;&nbsp;locales)</pre>
+<pre>public&nbsp;ContentfulCmsPage(com.contentful.java.cda.CDAEntry&nbsp;cdaEntry)</pre>
 </li>
 </ul>
 </li>
@@ -211,14 +218,26 @@ implements <a href="../../../../../com/commercetools/sunrise/cms/CmsPage.html" t
 <h4>field</h4>
 <pre>public&nbsp;java.util.Optional&lt;java.lang.String&gt;&nbsp;field(java.lang.String&nbsp;path)</pre>
 <div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../../com/commercetools/sunrise/cms/CmsPage.html#field-java.lang.String-">CmsPage</a></code></span></div>
-<div class="block">Gets the content corresponding to the given field name.</div>
+<div class="block">Get string representation of the content of cms node identified by the given path.
+ <p>
+ Path should form the string of several identifiers - cms node names - delimited with '.' character.
+ Each identifier might be appended with array integer index, e.g. '[3]'.
+ <p>
+ The path constructed in such way is used to traverse a <a href="../../../../../com/commercetools/sunrise/cms/CmsPage.html" title="interface in com.commercetools.sunrise.cms"><code>CmsPage</code></a> contained in this object.
+ <p>
+ E.g. firstLevel[2].secondLevel[3].thirdLevel[1] executed on this method should result in looking for third item
+ in 'firstLevel' node and if it is found then searching it for fourth item in its 'secondLevel' node.
+ Finally, if it is found then this item is searched for the array node identified with 'thirdLevel'
+ and retrieving second item from it. This last item should have a string representation.
+ <p>
+ If any step of this process fails empty optional is returned.</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
 <dd><code><a href="../../../../../com/commercetools/sunrise/cms/CmsPage.html#field-java.lang.String-">field</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../com/commercetools/sunrise/cms/CmsPage.html" title="interface in com.commercetools.sunrise.cms">CmsPage</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
-<dd><code>path</code> - identifying the field (e.g. banner.image.url)</dd>
+<dd><code>path</code> - identifying the field (e.g. banner[2].image[2])</dd>
 <dt><span class="returnLabel">Returns:</span></dt>
-<dd>the content identified by the key, or absent if not found</dd>
+<dd>content of node identified by the path, or absent if not found</dd>
 </dl>
 </li>
 </ul>
