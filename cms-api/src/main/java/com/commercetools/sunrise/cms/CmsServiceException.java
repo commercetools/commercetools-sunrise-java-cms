@@ -2,19 +2,12 @@ package com.commercetools.sunrise.cms;
 
 /**
  * An unchecked exception signalling that there was a problem when obtaining the content from the CMS.
- * It could be caused by wrong call parameters (eg. wrong credentials) or server side issues.
  * <p>
- * Exceptions of this type will often wrap a lower-level exception.
- *
- * @see Exception#getCause()
+ * It could be caused e.g. by wrong credentials, non-unique content requested etc.
  */
 public class CmsServiceException extends RuntimeException {
 
     public CmsServiceException(final String message, final Throwable cause) {
         super(message, cause);
-    }
-
-    public CmsServiceException(final Throwable cause) {
-        super(cause);
     }
 }

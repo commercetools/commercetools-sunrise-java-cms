@@ -1,6 +1,7 @@
 package com.commercetools.sunrise.cms.contentful;
 
 import com.commercetools.sunrise.cms.CmsPage;
+import com.commercetools.sunrise.cms.CmsService;
 import com.commercetools.sunrise.cms.CmsServiceException;
 import org.junit.Test;
 
@@ -20,34 +21,14 @@ import static org.assertj.core.api.ThrowableAssert.catchThrowable;
 public class ContentfulCmsServiceIT {
     private static final List<Locale> SUPPORTED_LOCALES = singletonList(Locale.GERMANY);
 
-    // credentials for contentful demo account
-    private static final String IT_PREFIX = "CONTENTFUL_";
-    private static final String IT_CF_SPACE_ID = IT_PREFIX + "SPACE_ID";
-    private static final String IT_CF_TOKEN = IT_PREFIX + "TOKEN";
     private static final String PAGE_TYPE_NAME = "page";
     private static final String PAGE_TYPE_ID_FIELD_NAME = "slug";
-
-    private static String spaceId() {
-        return getValueForEnvVar(IT_CF_SPACE_ID);
-    }
-
-    private static String token() {
-        return getValueForEnvVar(IT_CF_TOKEN);
-    }
-
-    @Test
-    public void whenCouldNotFetchEntry_thenThrowException() throws Exception {
-        final ContentfulCmsService cmsService = ContentfulCmsService.of("", "", PAGE_TYPE_NAME, PAGE_TYPE_ID_FIELD_NAME);
-
-        Throwable thrown = catchThrowable(() -> waitAndGet(cmsService.page("home", SUPPORTED_LOCALES)));
-
-        assertThat(thrown).isInstanceOf(ExecutionException.class).hasMessageContaining("Could not fetch content for home");
-        assertThat(thrown).hasCauseInstanceOf(CmsServiceException.class);
-    }
+    private static final String CONTENTFUL_SPACE_ID = "CONTENTFUL_SPACE_ID";
+    private static final String CONTENTFUL_TOKEN = "CONTENTFUL_TOKEN";
 
     @Test
     public void whenAskForExistingStringContent_thenGet() throws Exception {
-        ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), PAGE_TYPE_NAME, PAGE_TYPE_ID_FIELD_NAME);
+        CmsService contentfulCmsService = createService();
 
         Optional<CmsPage> content = waitAndGet(contentfulCmsService.page("finn", SUPPORTED_LOCALES));
 
@@ -58,7 +39,7 @@ public class ContentfulCmsServiceIT {
 
     @Test
     public void whenAskForExistingStringContentAndLocalesAreEmpty_thenGetDefaultLocaleContent() throws Exception {
-        ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), PAGE_TYPE_NAME, PAGE_TYPE_ID_FIELD_NAME);
+        CmsService contentfulCmsService = createService();
 
         Optional<CmsPage> content = waitAndGet(contentfulCmsService.page("finn", emptyList()));
 
@@ -68,21 +49,10 @@ public class ContentfulCmsServiceIT {
     }
 
     @Test
-    public void whenAskForExistingStringContentAndLocalesAreNull_thenGetDefaultLocaleContent() throws Exception {
-        ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), PAGE_TYPE_NAME, PAGE_TYPE_ID_FIELD_NAME);
-
-        Optional<CmsPage> content = waitAndGet(contentfulCmsService.page("finn", null));
-
-        assertThat(content).isPresent();
-        Optional<String> field = content.get().field("pageContent.description");
-        assertThat(field).hasValue("Fearless Abenteurer! Verteidiger von Pfannkuchen.");
-    }
-
-    @Test
     public void whenAskForExistingStringContentWithNotDefaultLocale_thenGetDefaultLocaleContent() throws Exception {
-        ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), PAGE_TYPE_NAME, PAGE_TYPE_ID_FIELD_NAME);
+        CmsService cmsService = createService();
 
-        Optional<CmsPage> content = waitAndGet(contentfulCmsService.page("finn", singletonList(Locale.ENGLISH)));
+        Optional<CmsPage> content = waitAndGet(cmsService.page("finn", singletonList(Locale.ENGLISH)));
 
         assertThat(content).isPresent();
         Optional<String> field = content.get().field("pageContent.description");
@@ -90,19 +60,60 @@ public class ContentfulCmsServiceIT {
     }
 
     @Test
-    public void whenAskForExistingStringContentWithNotDefinedLocale_thenReturnEmpty() throws Exception {
-        ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), PAGE_TYPE_NAME, PAGE_TYPE_ID_FIELD_NAME);
+    public void whenNoConfigurationForClientProvided_thenThrowException() throws Exception {
+        CmsService cmsService = ContentfulCmsService.of("", "", PAGE_TYPE_NAME, PAGE_TYPE_ID_FIELD_NAME, Runnable::run);
 
-        Optional<CmsPage> content = waitAndGet(contentfulCmsService.page("finn", singletonList(Locale.ITALIAN)));
+        Throwable thrown = catchThrowable(() -> waitAndGet(cmsService.page("home", SUPPORTED_LOCALES)));
 
-        assertThat(content).isNotPresent();
+        assertThat(thrown).isInstanceOf(ExecutionException.class).hasMessageContaining("Could not fetch content for home");
+        assertThat(thrown).hasCauseInstanceOf(CmsServiceException.class);
+    }
+
+    @Test
+    public void whenAskForContentWithLocaleNotDefinedInSpace_thenThrowException() throws Exception {
+        CmsService cmsService = createService();
+
+        Throwable thrown = catchThrowable(() -> waitAndGet(cmsService.page("finn", singletonList(Locale.ITALIAN))));
+
+        assertThat(thrown).isInstanceOf(ExecutionException.class).hasMessage("com.commercetools.sunrise.cms.CmsServiceException: Requested locale it is not defined on CMS. Could not fetch content for finn");
+        assertThat(thrown).hasCauseInstanceOf(CmsServiceException.class);
+    }
+
+    @Test
+    public void whenAskForContentWithNoGivenQueryFieldDefined_thenThrowException() throws Exception {
+        CmsService cmsService = ContentfulCmsService.of(spaceId(), token(), PAGE_TYPE_NAME, "non-existing-field-name", Runnable::run);
+
+        Throwable thrown = catchThrowable(() -> waitAndGet(cmsService.page("finn", singletonList(Locale.ENGLISH))));
+
+        assertThat(thrown).isInstanceOf(ExecutionException.class).hasMessageContaining("Could not fetch content for finn");
+        assertThat(thrown).hasCauseInstanceOf(CmsServiceException.class);
+    }
+
+    @Test
+    public void whenAskForContentForWhichThereIsNoContentTypeDefinedInSpace_thenThrowException() throws Exception {
+        CmsService cmsService = ContentfulCmsService.of(spaceId(), token(), "non-existing-page-type", PAGE_TYPE_ID_FIELD_NAME, Runnable::run);
+
+        Throwable thrown = catchThrowable(() -> waitAndGet(cmsService.page("finn", singletonList(Locale.ENGLISH))));
+
+        assertThat(thrown).isInstanceOf(ExecutionException.class).hasMessageContaining("Could not fetch content for finn");
+        assertThat(thrown).hasCauseInstanceOf(CmsServiceException.class);
+    }
+
+    @Test
+    public void whenAskForNonUniqueContent_thenThrowException() throws Exception {
+        CmsService cmsService = createService();
+
+        Throwable thrown = catchThrowable(() -> waitAndGet(cmsService.page("jacke", SUPPORTED_LOCALES)));
+
+        assertThat(thrown).hasCauseInstanceOf(CmsServiceException.class);
+        assertThat(thrown.getCause()).hasMessage("Non unique identifier used. Result contains more than one page for jacke");
     }
 
     @Test
     public void whenAskForNotExistingStringContent_thenReturnEmpty() throws Exception {
-        ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), PAGE_TYPE_NAME, PAGE_TYPE_ID_FIELD_NAME);
+        CmsService cmsService = createService();
 
-        Optional<CmsPage> content = waitAndGet(contentfulCmsService.page("finn", SUPPORTED_LOCALES));
+        Optional<CmsPage> content = waitAndGet(cmsService.page("finn", SUPPORTED_LOCALES));
 
         assertThat(content).isPresent();
         Optional<String> field = content.get().field("pageContent.notExistingField");
@@ -110,31 +121,17 @@ public class ContentfulCmsServiceIT {
     }
 
     @Test
-    public void whenAskForExistingAssetContent_thenGet() throws Exception {
-        ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), PAGE_TYPE_NAME, PAGE_TYPE_ID_FIELD_NAME);
+    public void whenRequestedPageDoesNotExist_thenReturnEmpty() throws Exception {
+        CmsService cmsService = createService();
 
-        Optional<CmsPage> content = waitAndGet(contentfulCmsService.page("jacke", SUPPORTED_LOCALES));
+        Optional<CmsPage> content = waitAndGet(cmsService.page("non-existing-page-key", SUPPORTED_LOCALES));
 
-        assertThat(content).isPresent();
-        String actual = content.get().fieldOrEmpty("pageContent.image");
-        assertThat(actual).isEqualToIgnoringCase("//images.contentful.com/l6chdlzlf8jn/2iVeCh1FGoy00Oq8WEI2aI/93c3f0841fcf59743f57e238f6ed67aa/jake.png");
-    }
-
-    @Test
-    public void whenAskForNotExistingAssetContent_thenReturnEmpty() throws Exception {
-        ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), PAGE_TYPE_NAME, PAGE_TYPE_ID_FIELD_NAME);
-
-        Optional<CmsPage> content = waitAndGet(contentfulCmsService.page("jacke", SUPPORTED_LOCALES));
-
-        assertThat(content).isPresent();
-        String actual = content.get().fieldOrEmpty("pageContent.notExistingAsset");
-        assertThat(actual).isEmpty();
-
+        assertThat(content).isNotPresent();
     }
 
     @Test
     public void whenAskForContentInArray_thenGetElement() throws Exception {
-        ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), "finn", PAGE_TYPE_ID_FIELD_NAME);
+        ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), "finn", PAGE_TYPE_ID_FIELD_NAME, Runnable::run);
         Optional<CmsPage> content = contentfulCmsService.page("finn", emptyList()).toCompletableFuture().get(5, TimeUnit.SECONDS);
 
         assertThat(content).isPresent();
@@ -144,7 +141,7 @@ public class ContentfulCmsServiceIT {
 
     @Test
     public void whenAskForContentInArrayOutsideTheScope_thenReturnEmpty() throws Exception {
-        ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), "finn", PAGE_TYPE_ID_FIELD_NAME);
+        ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), "finn", PAGE_TYPE_ID_FIELD_NAME, Runnable::run);
 
         Optional<CmsPage> content = contentfulCmsService.page("finn", emptyList()).toCompletableFuture().get(5, TimeUnit.SECONDS);
 
@@ -156,7 +153,7 @@ public class ContentfulCmsServiceIT {
 
     @Test
     public void whenAskForContentInNestedArray_thenGetElement() throws Exception {
-        ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), "finn", PAGE_TYPE_ID_FIELD_NAME);
+        ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), "finn", PAGE_TYPE_ID_FIELD_NAME, Runnable::run);
 
         Optional<CmsPage> content = contentfulCmsService.page("finn", emptyList()).toCompletableFuture().get(5, TimeUnit.SECONDS);
 
@@ -167,7 +164,7 @@ public class ContentfulCmsServiceIT {
 
     @Test
     public void whenAskForTextContentArray_thenGetElement() throws Exception {
-        ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), "finn", PAGE_TYPE_ID_FIELD_NAME);
+        ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), "finn", PAGE_TYPE_ID_FIELD_NAME, Runnable::run);
 
         Optional<CmsPage> content = contentfulCmsService.page("finn", emptyList()).toCompletableFuture().get(5, TimeUnit.SECONDS);
 
@@ -178,7 +175,7 @@ public class ContentfulCmsServiceIT {
 
     @Test
     public void whenAskForLocation_thenGetLocationField() throws Exception {
-        ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), "finn", PAGE_TYPE_ID_FIELD_NAME);
+        ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), "finn", PAGE_TYPE_ID_FIELD_NAME, Runnable::run);
 
         Optional<CmsPage> content = contentfulCmsService.page("finn", emptyList()).toCompletableFuture().get(5, TimeUnit.SECONDS);
 
@@ -189,7 +186,7 @@ public class ContentfulCmsServiceIT {
 
     @Test
     public void whenAskForContentInMediaField_thenGetUrlField() throws Exception {
-        ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), "finn", PAGE_TYPE_ID_FIELD_NAME);
+        ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), "finn", PAGE_TYPE_ID_FIELD_NAME, Runnable::run);
 
         Optional<CmsPage> content = contentfulCmsService.page("finn", emptyList()).toCompletableFuture().get(5, TimeUnit.SECONDS);
 
@@ -200,7 +197,7 @@ public class ContentfulCmsServiceIT {
 
     @Test
     public void whenAskForContentInMediaArray_thenGetUrlElements() throws Exception {
-        ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), "finn", PAGE_TYPE_ID_FIELD_NAME);
+        ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), "finn", PAGE_TYPE_ID_FIELD_NAME, Runnable::run);
 
         Optional<CmsPage> content = contentfulCmsService.page("finn", emptyList()).toCompletableFuture().get(5, TimeUnit.SECONDS);
 
@@ -214,7 +211,7 @@ public class ContentfulCmsServiceIT {
 
     @Test
     public void whenAskForArray_thenReturnEmpty() throws Exception {
-        ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), "finn", PAGE_TYPE_ID_FIELD_NAME);
+        ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), "finn", PAGE_TYPE_ID_FIELD_NAME, Runnable::run);
 
         Optional<CmsPage> content = contentfulCmsService.page("finn", emptyList()).toCompletableFuture().get(5, TimeUnit.SECONDS);
 
@@ -226,7 +223,7 @@ public class ContentfulCmsServiceIT {
 
     @Test
     public void whenAskForContentWithGermanOrEmptyLocales_thenGetGermanTranslation() throws Exception {
-        ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), "finn", PAGE_TYPE_ID_FIELD_NAME);
+        ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), "finn", PAGE_TYPE_ID_FIELD_NAME, Runnable::run);
 
         Optional<CmsPage> content = contentfulCmsService.page("finn", SUPPORTED_LOCALES).toCompletableFuture().get(5, TimeUnit.SECONDS);
 
@@ -239,15 +236,11 @@ public class ContentfulCmsServiceIT {
         assertThat(content).isPresent();
         field = content.get().field("array[3].textArrayField[1]");
         assertThat(field).hasValue("zwei");
-
-        content = waitAndGet(contentfulCmsService.page("finn", singletonList(Locale.ITALIAN)));
-
-        assertThat(content).isNotPresent();
     }
 
     @Test
     public void whenAskForContentWithEnglishTranslation_thenGetEnglishTranslation() throws Exception {
-        ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), "finn", PAGE_TYPE_ID_FIELD_NAME);
+        ContentfulCmsService contentfulCmsService = ContentfulCmsService.of(spaceId(), token(), "finn", PAGE_TYPE_ID_FIELD_NAME, Runnable::run);
 
         Optional<CmsPage> content = contentfulCmsService.page("finn", singletonList(Locale.ENGLISH)).toCompletableFuture().get(5, TimeUnit.SECONDS);
 
@@ -260,12 +253,24 @@ public class ContentfulCmsServiceIT {
         return stage.toCompletableFuture().get(5, TimeUnit.SECONDS);
     }
 
+    private CmsService createService() {
+        return ContentfulCmsService.of(spaceId(), token(), PAGE_TYPE_NAME, PAGE_TYPE_ID_FIELD_NAME, Runnable::run);
+    }
+
+    private static String spaceId() {
+        return getValueForEnvVar(CONTENTFUL_SPACE_ID);
+    }
+
+    private static String token() {
+        return getValueForEnvVar(CONTENTFUL_TOKEN);
+    }
+
     private static String getValueForEnvVar(final String key) {
         return Optional.ofNullable(System.getenv(key))
                 .orElseThrow(() -> new RuntimeException(
                         "Missing environment variable " + key + ", please provide the following environment variables for the integration test:\n" +
-                                "export " + IT_CF_SPACE_ID + "=\"Your Contentful project key\"\n" +
-                                "export " + IT_CF_TOKEN + "=\"Your Contentful authentication token\"\n"));
+                                "export " + CONTENTFUL_SPACE_ID + "=\"Your Contentful project key\"\n" +
+                                "export " + CONTENTFUL_TOKEN + "=\"Your Contentful authentication token\"\n"));
     }
 
 }
