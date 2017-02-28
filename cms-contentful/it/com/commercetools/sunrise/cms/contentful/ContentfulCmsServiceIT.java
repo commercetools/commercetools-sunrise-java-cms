@@ -207,7 +207,7 @@ public class ContentfulCmsServiceIT {
         Optional<String> field = page.get().field("array[3].textArrayField[1]");
         assertThat(field).hasValue("zwei");
 
-        page = cmsServiceFor_Finn_PageType.page("finn", emptyList()).toCompletableFuture().get(5, TimeUnit.SECONDS);
+        page = waitAndGet(cmsServiceFor_Finn_PageType.page("finn", emptyList()));
 
         assertThat(page).isPresent();
         field = page.get().field("array[3].textArrayField[1]");
