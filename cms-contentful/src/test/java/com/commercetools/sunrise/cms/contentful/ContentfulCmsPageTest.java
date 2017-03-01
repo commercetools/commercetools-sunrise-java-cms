@@ -8,6 +8,7 @@ import com.contentful.java.cda.CDAField;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,7 +22,27 @@ import static org.mockito.Mockito.when;
 public class ContentfulCmsPageTest {
 
     @Test
-    public void whenEntryDoesNotHaveRequiredField_thenReturnOptionalEmpty() throws Exception {
+    public void verifyFieldsOfAllTypesWithDirectStringRepresentation() {
+        Map<FieldType, Object> typeToContentMap = new HashMap<>();
+        typeToContentMap.put(BOOLEAN, true);
+        typeToContentMap.put(DATE, Calendar.getInstance().getTime());
+        typeToContentMap.put(INTEGER, 13);
+        typeToContentMap.put(NUMBER, 3.14);
+        typeToContentMap.put(SYMBOL, "Content of a symbol field");
+        typeToContentMap.put(TEXT, "Content of a text field");
+        typeToContentMap.put(LOCATION, "{lon=19.62, lat=51.37}");
+
+        typeToContentMap.forEach((fieldType, fieldContent) -> {
+            CmsPage cmsPage = new ContentfulCmsPage(mockEntryWithField("aField", fieldContent, fieldType.type()));
+
+            Optional<String> content = cmsPage.field("aField");
+
+            assertThat(content).hasValue(String.valueOf(fieldContent));
+        });
+    }
+
+    @Test
+    public void whenNoSuchField_returnEmpty() {
         CmsPage cmsPage = new ContentfulCmsPage(mockEntryWithField("aField", "Content of a field", SYMBOL.type()));
 
         Optional<String> content = cmsPage.field("notMatchingFieldName");
@@ -30,61 +51,7 @@ public class ContentfulCmsPageTest {
     }
 
     @Test
-    public void whenEntryExistsInSupportedLanguage_thenReturnIt() throws Exception {
-        CmsPage cmsPage = new ContentfulCmsPage(mockEntryWithField("aField", "Content of a field", SYMBOL.type()));
-
-        Optional<String> content = cmsPage.field("aField");
-
-        assertThat(content).hasValue("Content of a field");
-    }
-
-    @Test
-    public void whenEntryFieldTypeIsText_thenReturnOptionalString() throws Exception {
-        CmsPage cmsPage = new ContentfulCmsPage(mockEntryWithField("aField", "Content of a field", SYMBOL.type()));
-
-        Optional<String> content = cmsPage.field("aField");
-
-        assertThat(content).hasValue("Content of a field");
-    }
-
-    @Test
-    public void whenEntryFieldTypeIsDate_thenReturnOptionalString() throws Exception {
-        CmsPage cmsPage = new ContentfulCmsPage(mockEntryWithField("aField", "2015-11-06T09:45:27", DATE.type()));
-
-        Optional<String> content = cmsPage.field("aField");
-
-        assertThat(content).hasValue("2015-11-06T09:45:27");
-    }
-
-    @Test
-    public void whenEntryFieldTypeIsInteger_thenReturnOptionalString() throws Exception {
-        CmsPage cmsPage = new ContentfulCmsPage(mockEntryWithField("aField", 13, INTEGER.type()));
-
-        Optional<String> content = cmsPage.field("aField");
-
-        assertThat(content).hasValue(String.valueOf(13));
-    }
-
-    @Test
-    public void whenEntryFieldTypeIsNumber_thenReturnOptionalString() throws Exception {
-        CmsPage cmsPage = new ContentfulCmsPage(mockEntryWithField("aField", 3.14, NUMBER.type()));
-
-        Optional<String> content = cmsPage.field("aField");
-
-        assertThat(content).hasValue(String.valueOf(3.14));
-    }
-
-    @Test
-    public void whenEntryFieldTypeIsBoolean_thenReturnOptionalString() throws Exception {
-        CmsPage cmsPage = new ContentfulCmsPage(mockEntryWithField("aField", true, BOOLEAN.type()));
-
-        Optional<String> content = cmsPage.field("aField");
-
-        assertThat(content).hasValue(String.valueOf(true));
-    }
-
-    @Test
-    public void whenEntryFieldTypeIsLinkAsset_thenReturnOptionalString() throws Exception {
+    public void whenFieldTypeIsLinkAsset_returnIt() {
         CDAAsset assetContent = mock(CDAAsset.class);
         when(assetContent.url()).thenReturn("//some.url");
         CmsPage cmsPage = new ContentfulCmsPage(mockEntryWithField("aField", assetContent, ASSET.type()));
@@ -95,7 +62,7 @@ public class ContentfulCmsPageTest {
     }
 
     @Test
-    public void whenEntryFieldTypeLinkIsOtherThanAsset_thenReturnOptionalEmpty() throws Exception {
+    public void whenFieldTypeLinkIsOtherThanAsset_returnEmpty() {
         CDAAsset assetContent = mock(CDAAsset.class);
         when(assetContent.url()).thenReturn("//some.url");
         CmsPage cmsPage = new ContentfulCmsPage(mockEntryWithField("aField", assetContent, "foo"));
@@ -106,7 +73,7 @@ public class ContentfulCmsPageTest {
     }
 
     @Test
-    public void whenAssetHasNoUrl_thenReturnOptionalEmpty() throws Exception {
+    public void whenAssetHasNoUrl_returnEmpty() {
         CDAAsset assetContent = mock(CDAAsset.class);
         when(assetContent.url()).thenReturn(null);
         CmsPage cmsPage = new ContentfulCmsPage(mockEntryWithField("aField", assetContent, ASSET.type()));
@@ -117,16 +84,7 @@ public class ContentfulCmsPageTest {
     }
 
     @Test
-    public void whenEntryFieldTypeIsLocation_thenReturnOptionalString() throws Exception {
-        CmsPage cmsPage = new ContentfulCmsPage(mockEntryWithField("aField", "{lon=19.62, lat=51.37}", LOCATION.type()));
-
-        Optional<String> content = cmsPage.field("aField");
-
-        assertThat(content).hasValue("{lon=19.62, lat=51.37}");
-    }
-
-    @Test
-    public void whenEntryFieldTypeIsArrayOfText_thenReturnOptionalString() throws Exception {
+    public void whenFieldTypeIsArrayOfText_returnIt() {
         CmsPage cmsPage = new ContentfulCmsPage(mockEntryWithField("textArrayField", createArray("two"), TEXT.type()));
 
         Optional<String> content = cmsPage.field("textArrayField[1]");
@@ -135,7 +93,7 @@ public class ContentfulCmsPageTest {
     }
 
     @Test
-    public void whenEntryFieldTypeIsArrayOfLinkAssetsInsideArrayEntry_thenReturnOptionalString() throws Exception {
+    public void whenFieldTypeIsArrayOfLinkAssetsInsideArrayEntry_returnIt() {
         CDAAsset assetContent = mock(CDAAsset.class);
         when(assetContent.url()).thenReturn("//url");
         CDAEntry mockCdaEntry = mockEntryWithField("assetArrayField", createArray(assetContent), ASSET.type());
