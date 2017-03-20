@@ -19,6 +19,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executor;
+import java.util.function.Supplier;
 
 /**
  * Service providing access to CMS pages from Contentful platform.
@@ -91,7 +92,13 @@ public class ContentfulCmsService implements CmsService {
      */
     public static ContentfulCmsService of(final String spaceId, final String token, final String pageType,
                                           final String pageQueryField, final Executor callbackExecutor) {
-        return new ContentfulCmsService(createClient(spaceId, token), pageType, pageQueryField, callbackExecutor);
+        return of(() -> createClient(spaceId, token), pageType, pageQueryField, callbackExecutor);
+    }
+
+    static ContentfulCmsService of(final Supplier<CDAClient> contentfulClientProvider,
+                                   final String pageType, final String pageQueryField,
+                                   final Executor callbackExecutor) {
+        return new ContentfulCmsService(contentfulClientProvider.get(), pageType, pageQueryField, callbackExecutor);
     }
 
     private static CDAClient createClient(final String spaceId, final String token) {
@@ -101,11 +108,12 @@ public class ContentfulCmsService implements CmsService {
                 .build();
     }
 
+    // TODO PB refactor
     /**
      * An Object handling all communication with Contentful platform based on given configuration in order to fetch
      * requested cms page for given locale.
      */
-    private class ContentCallback {
+    class ContentCallback {
         private final String pageKey;
         private final String locale;
 
@@ -136,7 +144,7 @@ public class ContentfulCmsService implements CmsService {
          * <p>
          * In case fetching failed a meaningful message is returned in {@link CmsServiceException}.
          */
-        private class ContentfulCallback extends CDACallback<CDAArray> {
+        class ContentfulCallback extends CDACallback<CDAArray> {
             private final CompletableFuture<Optional<CDAEntry>> future = new CompletableFuture<>();
 
             @Override

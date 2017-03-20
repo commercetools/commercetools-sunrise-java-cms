@@ -2,19 +2,25 @@ package com.commercetools.sunrise.cms.contentful;
 
 import com.commercetools.sunrise.cms.CmsPage;
 import com.contentful.java.cda.CDAAsset;
-import com.contentful.java.cda.CDAContentType;
 import com.contentful.java.cda.CDAEntry;
-import com.contentful.java.cda.CDAField;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.commercetools.sunrise.cms.contentful.FieldType.*;
+import static com.commercetools.sunrise.cms.contentful.ContentfulMockUtil.mockEntryWithField;
+import static com.commercetools.sunrise.cms.contentful.FieldType.ARRAY;
+import static com.commercetools.sunrise.cms.contentful.FieldType.ASSET;
+import static com.commercetools.sunrise.cms.contentful.FieldType.BOOLEAN;
+import static com.commercetools.sunrise.cms.contentful.FieldType.DATE;
+import static com.commercetools.sunrise.cms.contentful.FieldType.INTEGER;
+import static com.commercetools.sunrise.cms.contentful.FieldType.LOCATION;
+import static com.commercetools.sunrise.cms.contentful.FieldType.NUMBER;
+import static com.commercetools.sunrise.cms.contentful.FieldType.SYMBOL;
+import static com.commercetools.sunrise.cms.contentful.FieldType.TEXT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -114,29 +120,4 @@ public class ContentfulCmsPageTest {
         return array;
     }
 
-    private CDAEntry mockEntryWithField(String fieldName, Object fieldContent, String fieldType) {
-        CDAEntry mockCdaEntry = mock(CDAEntry.class);
-        CDAContentType mockContentType = mockContentType(fieldName, fieldContent, fieldType);
-        when(mockCdaEntry.contentType()).thenReturn(mockContentType);
-        when(mockCdaEntry.getField(fieldName)).thenReturn(fieldContent);
-        when(mockCdaEntry.rawFields()).thenReturn(Collections.singletonMap(fieldName, new Object()));
-        return mockCdaEntry;
-    }
-
-    private CDAContentType mockContentType(String fieldName, Object fieldContent, String fieldType) {
-        CDAField mockCdaField = mock(CDAField.class);
-
-        when(mockCdaField.type()).thenReturn(fieldContent instanceof ArrayList ? ARRAY.type() : fieldType);
-        when(mockCdaField.linkType()).thenReturn(fieldType);
-        when(mockCdaField.id()).thenReturn(fieldName);
-
-        Map<String, Object> items = new HashMap<>();
-        items.put("type", fieldType);
-        items.put("linkType", fieldType);
-        when(mockCdaField.items()).thenReturn(items);
-
-        CDAContentType mockContentType = mock(CDAContentType.class);
-        when(mockContentType.fields()).thenReturn(Collections.singletonList(mockCdaField));
-        return mockContentType;
-    }
 }

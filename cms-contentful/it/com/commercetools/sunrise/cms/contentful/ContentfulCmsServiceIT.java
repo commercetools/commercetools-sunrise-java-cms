@@ -10,11 +10,11 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Objects.isNull;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.ThrowableAssert.catchThrowable;
 
@@ -224,7 +224,7 @@ public class ContentfulCmsServiceIT {
     }
 
     private Optional<CmsPage> waitAndGet(final CompletionStage<Optional<CmsPage>> stage) throws Exception {
-        return stage.toCompletableFuture().get(5, TimeUnit.SECONDS);
+        return stage.toCompletableFuture().get(5, SECONDS);
     }
 
     private static CmsService service(String pageType) {
