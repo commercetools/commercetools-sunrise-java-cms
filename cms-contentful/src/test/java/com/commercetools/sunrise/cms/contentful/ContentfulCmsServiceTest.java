@@ -7,18 +7,16 @@ import com.contentful.java.cda.CDAArray;
 import com.contentful.java.cda.CDAClient;
 import com.contentful.java.cda.CDAEntry;
 import com.contentful.java.cda.CDAResource;
+import com.contentful.java.cda.CDASpace;
 import com.contentful.java.cda.FetchQuery;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.CompletionStage;
-import java.util.concurrent.ExecutionException;
 import java.util.function.Supplier;
 
 import static com.commercetools.sunrise.cms.contentful.ContentfulMockUtil.mockEntryWithField;
@@ -85,9 +83,8 @@ public class ContentfulCmsServiceTest {
         assertThat(thrown.getCause()).hasMessage("Non unique identifier used. Result contains more than one page for aPage");
     }
 
-    // TODO check this more
     @Test
-    public void whenAskWithSthWrong_thenCompleteExceptionally() {
+    public void whenAskWithOtherFailure_thenCompleteExceptionally() {
         FetchQuery<CDAEntry> fetchQuery = getFetchQueryForException(new Exception());
         CDAClient cdaClient = mockCdaClient(fetchQuery);
         CmsService cmsService = service(() -> cdaClient);
@@ -95,6 +92,39 @@ public class ContentfulCmsServiceTest {
         Throwable thrown = catchThrowable(() -> get(cmsService.page("aPage", emptyList())));
 
         assertThat(thrown).isInstanceOf(CompletionException.class).hasMessageContaining("Could not fetch content for aPage");
+        assertThat(thrown).hasCauseInstanceOf(CmsServiceException.class);
+    }
+
+    @Test
+    public void whenAskWith400FailureAndLocaleFetchThrowingRuntimeException_thenCompleteExceptionally() {
+        Exception throwable = new Exception("code=400");
+        FetchQuery<CDAEntry> fetchQuery = getFetchQueryForException(throwable);
+        CDAClient cdaClient = mockCdaClient(fetchQuery);
+        //noinspection unchecked
+        when(cdaClient.fetchSpace()).thenThrow(RuntimeException.class);
+        CmsService cmsService = service(() -> cdaClient);
+
+        Throwable thrown = catchThrowable(() -> get(cmsService.page("aPage", emptyList())));
+
+        assertThat(thrown).isInstanceOf(CompletionException.class).hasMessageContaining("Could not fetch content for aPage");
+        assertThat(thrown).hasCauseInstanceOf(CmsServiceException.class);
+    }
+
+    @Test
+    public void whenAskWith400FailureAndLocaleNotInSpace_thenCompleteExceptionally() {
+        Exception throwable = new Exception("code=400");
+        FetchQuery<CDAEntry> fetchQuery = getFetchQueryForException(throwable);
+        CDAClient cdaClient = mockCdaClient(fetchQuery);
+        //noinspection unchecked
+        CDASpace cdaSpace = mock(CDASpace.class);
+        when(cdaSpace.locales()).thenReturn(emptyList());
+        when(cdaClient.fetchSpace()).thenReturn(cdaSpace);
+        CmsService cmsService = service(() -> cdaClient);
+
+        Throwable thrown = catchThrowable(() -> get(cmsService.page("aPage", singletonList(Locale.CHINESE))));
+
+        assertThat(thrown).isInstanceOf(CompletionException.class)
+                .hasMessageContaining("Requested locale zh is not defined on CMS. Could not fetch content for aPage");
         assertThat(thrown).hasCauseInstanceOf(CmsServiceException.class);
     }
 
