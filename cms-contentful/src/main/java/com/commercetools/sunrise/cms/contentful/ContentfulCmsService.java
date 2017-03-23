@@ -11,7 +11,6 @@ import com.contentful.java.cda.CDALocale;
 import com.contentful.java.cda.CDAResource;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -173,7 +172,7 @@ public class ContentfulCmsService implements CmsService {
                     } else {
                         completeExceptionally("Could not fetch content for " + pageKey, error);
                     }
-                } catch (IOException e) {
+                } catch (Throwable e) {
                     completeExceptionally("Could not fetch content for " + pageKey, error);
                 }
             }
@@ -182,7 +181,7 @@ public class ContentfulCmsService implements CmsService {
                 future.completeExceptionally(new CmsServiceException(message, cause));
             }
 
-            boolean localeNotInSpace() throws IOException {
+            boolean localeNotInSpace() {
                 List<CDALocale> contentfulLocales = client.fetchSpace().locales();
                 return contentfulLocales.stream()
                         .noneMatch(cdaLocale -> Objects.equals(cdaLocale.code(), locale));
