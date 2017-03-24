@@ -14,7 +14,6 @@ lazy val `commercetools-sunrise-cms` = (project in file("."))
   .settings(javaUnidocSettings ++ commonSettings : _*)
 
 lazy val `cms-api` = project
-  .configs(IntegrationTest)
   .settings(commonSettings ++ commonTestSettings : _*)
   .settings(
     libraryDependencies ++= Seq(
@@ -29,7 +28,6 @@ lazy val `cms-api` = project
 //  .dependsOn(`cms-api`)
 
 lazy val `cms-contentful` = project
-  .configs(IntegrationTest)
   .settings(commonSettings ++ commonTestSettings : _*)
   .settings(
     libraryDependencies ++= Seq(
@@ -57,9 +55,7 @@ lazy val commonSettings = Release.publishSettings ++ Seq (
  * TEST SETTINGS
  */
 
-lazy val commonTestSettings = itBaseTestSettings ++ configCommonTestSettings("test,it")
-
-lazy val itBaseTestSettings = Defaults.itSettings ++ configTestDirs(IntegrationTest, "it")
+lazy val commonTestSettings = configCommonTestSettings("test")
 
 def configTestDirs(config: Configuration, folderName: String) = Seq(
   javaSource in config := baseDirectory.value / folderName,
