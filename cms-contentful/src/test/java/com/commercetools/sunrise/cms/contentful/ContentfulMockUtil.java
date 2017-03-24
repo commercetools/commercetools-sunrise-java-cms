@@ -15,6 +15,13 @@ import static org.mockito.Mockito.when;
 
 class ContentfulMockUtil {
 
+    static CDAEntry mockEntryWithField(String fieldName, Object fieldContent) {
+        CDAEntry mockCdaEntry = mock(CDAEntry.class);
+        when(mockCdaEntry.getField(fieldName)).thenReturn(fieldContent);
+        when(mockCdaEntry.rawFields()).thenReturn(Collections.singletonMap(fieldName, new Object()));
+        return mockCdaEntry;
+    }
+
     static CDAEntry mockEntryWithField(String fieldName, Object fieldContent, String fieldType) {
         CDAEntry mockCdaEntry = mock(CDAEntry.class);
         CDAContentType mockContentType = mockContentType(fieldName, fieldContent, fieldType);
@@ -22,10 +29,6 @@ class ContentfulMockUtil {
         when(mockCdaEntry.getField(fieldName)).thenReturn(fieldContent);
         when(mockCdaEntry.rawFields()).thenReturn(Collections.singletonMap(fieldName, new Object()));
         return mockCdaEntry;
-    }
-
-    static CDAEntry mockEntryWithField(String fieldName, Object fieldContent) {
-        return mockEntryWithField(fieldName, fieldContent, null);
     }
 
     private static CDAContentType mockContentType(String fieldName, Object fieldContent, String fieldType) {
