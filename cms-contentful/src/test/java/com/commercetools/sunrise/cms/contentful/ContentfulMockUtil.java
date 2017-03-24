@@ -24,6 +24,10 @@ class ContentfulMockUtil {
         return mockCdaEntry;
     }
 
+    static CDAEntry mockEntryWithField(String fieldName, Object fieldContent) {
+        return mockEntryWithField(fieldName, fieldContent, null);
+    }
+
     private static CDAContentType mockContentType(String fieldName, Object fieldContent, String fieldType) {
         CDAField mockCdaField = mock(CDAField.class);
 

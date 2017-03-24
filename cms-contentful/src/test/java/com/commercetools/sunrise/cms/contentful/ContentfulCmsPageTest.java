@@ -28,6 +28,15 @@ import static org.mockito.Mockito.when;
 public class ContentfulCmsPageTest {
 
     @Test
+    public void whenEmptyPath_thenEmptyResult() {
+        ContentfulCmsPage page = new ContentfulCmsPage(null);
+
+        assertThat(page.field(null)).isNotPresent();
+        assertThat(page.field("")).isNotPresent();
+        assertThat(page.field(" ")).isNotPresent();
+    }
+
+    @Test
     public void verifyFieldsOfAllTypesWithDirectStringRepresentation() {
         Map<FieldType, Object> typeToContentMap = new HashMap<>();
         typeToContentMap.put(BOOLEAN, true);
@@ -111,12 +120,116 @@ public class ContentfulCmsPageTest {
         assertThat(content).hasValue("//url");
     }
 
+    @Test
+    public void whenExpectedArrayEntryButNotMatched_returnEmpty() {
+        CDAEntry mockCdaEntry = mockEntryWithField("aField", "true", BOOLEAN.type());
+        CmsPage cmsPage = new ContentfulCmsPage(mockCdaEntry);
+
+        Optional<String> content = cmsPage.field("array[1].assetArrayField[1]");
+
+        assertThat(content).isNotPresent();
+    }
+
+    @Test
+    public void whenExpectedArrayEntryButNotMatchedAsList_returnEmpty() {
+        CDAEntry mockCdaEntry = mockEntryWithField("assetField", "true", BOOLEAN.type());
+        CDAEntry mockCdaArrayEntry = mockEntryWithField("array", mockCdaEntry);
+        CmsPage cmsPage = new ContentfulCmsPage(mockCdaArrayEntry);
+
+        Optional<String> content = cmsPage.field("array[1].assetField[1]");
+
+        assertThat(content).isNotPresent();
+    }
+
+    @Test
+    public void whenExpectedFieldInArrayButNotMatchedAsArray_returnEmpty() {
+        CDAEntry mockCdaEntry = mockEntryWithField("assetField", "text", TEXT.type());
+        CDAEntry mockCdaArrayEntry = mockEntryWithField("array", mockCdaEntry);
+        CmsPage cmsPage = new ContentfulCmsPage(mockCdaArrayEntry);
+
+        Optional<String> content = cmsPage.field("array.assetField[1]");
+
+        assertThat(content).isNotPresent();
+    }
+
+    @Test
+    public void whenExpectedFieldInArrayButNotMatchedAsList_returnEmpty() {
+        CDAEntry mockCdaEntry = mockEntryWithField("assetField", "text", ARRAY.type());
+        CDAEntry mockCdaArrayEntry = mockEntryWithField("array", mockCdaEntry);
+        CmsPage cmsPage = new ContentfulCmsPage(mockCdaArrayEntry);
+
+        Optional<String> content = cmsPage.field("array.assetField[1]");
+
+        assertThat(content).isNotPresent();
+    }
+
+    @Test
+    public void whenExpectedFieldInArrayButExceedingSize_returnEmpty() {
+        CDAEntry mockCdaEntry = mockEntryWithField("assetField", createArray("text"), TEXT.type());
+        CDAEntry mockCdaArrayEntry = mockEntryWithField("array", mockCdaEntry);
+        CmsPage cmsPage = new ContentfulCmsPage(mockCdaArrayEntry);
+
+        Optional<String> content = cmsPage.field("array.assetField[3]");
+
+        assertThat(content).isNotPresent();
+    }
+
+    @Test
+    public void whenManySimpleSegmentsPresent_returnIt() {
+        CDAEntry fourth = mockEntryWithField("fourth", "true", BOOLEAN.type());
+        CDAEntry third = mockEntryWithField("third", fourth);
+        CDAEntry second = mockEntryWithField("second", third);
+        CDAEntry first = mockEntryWithField("first", second);
+        CmsPage cmsPage = new ContentfulCmsPage(first);
+
+        Optional<String> content = cmsPage.field("first.second.third.fourth");
+
+        assertThat(content).hasValue("true");
+    }
+
+    @Test
+    public void whenManySegmentsPresent_returnIt() {
+        CDAEntry fourth = mockEntryWithField("fourth", createArray("text", "text2"), TEXT.type());
+        CDAEntry third = mockEntryWithField("third", createArray(fourth, "text3"), TEXT.type());
+        CDAEntry second = mockEntryWithField("second", third);
+        CDAEntry first = mockEntryWithField("first", second);
+        CmsPage cmsPage = new ContentfulCmsPage(first);
+
+        Optional<String> content = cmsPage.field("first.second.third[1].fourth[1]");
+        assertThat(content).hasValue("text");
+        Optional<String> content1 = cmsPage.field("first.second.third[1].fourth[2]");
+        assertThat(content1).hasValue("text2");
+        Optional<String> content2 = cmsPage.field("first.second.third[2]");
+        assertThat(content2).hasValue("text3");
+    }
+
+    @Test
+    public void whenIncorrectSegments_returnEmpty() {
+        CDAEntry fourth = mockEntryWithField("fourth", createArray("text", "text2"), TEXT.type());
+        CDAEntry third = mockEntryWithField("third", createArray(fourth, "text3"), TEXT.type());
+        CDAEntry second = mockEntryWithField("second", third);
+        CDAEntry first = mockEntryWithField("first", second);
+        CmsPage cmsPage = new ContentfulCmsPage(first);
+
+        Optional<String> content = cmsPage.field("first.second.third[1].frth[1]");
+        assertThat(content).isNotPresent();
+        Optional<String> content1 = cmsPage.field("first.second.thrd[1].fourth[2]");
+        assertThat(content1).isNotPresent();
+        Optional<String> content2 = cmsPage.field("fist.second.third[2]");
+        assertThat(content2).isNotPresent();
+    }
+
     // create array list with given object on the second position
     private ArrayList<Object> createArray(Object object) {
+        return createArray(object, new Object());
+    }
+
+    // create array list with given objects on the second and third position
+    private ArrayList<Object> createArray(Object object1, Object object2) {
         ArrayList<Object> array = new ArrayList<>();
         array.add(new Object());
-        array.add(object);
-        array.add(new Object());
+        array.add(object1);
+        array.add(object2);
         return array;
     }
 

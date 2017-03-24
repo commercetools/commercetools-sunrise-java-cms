@@ -39,7 +39,7 @@ public class ContentfulCmsPage implements CmsPage {
 
     @Override
     public Optional<String> field(final String path) {
-        if (StringUtils.isEmpty(path)) {
+        if (StringUtils.isBlank(path)) {
             return Optional.empty();
         }
 
