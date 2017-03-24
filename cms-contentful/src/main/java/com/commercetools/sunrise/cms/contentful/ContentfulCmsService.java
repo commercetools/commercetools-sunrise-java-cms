@@ -107,7 +107,6 @@ public class ContentfulCmsService implements CmsService {
                 .build();
     }
 
-    // TODO PB refactor
     /**
      * An Object handling all communication with Contentful platform based on given configuration in order to fetch
      * requested cms page for given locale.
@@ -116,7 +115,7 @@ public class ContentfulCmsService implements CmsService {
         private final String pageKey;
         private final String locale;
 
-        ContentCallback(final String pageKey, final String locale) {
+        private ContentCallback(final String pageKey, final String locale) {
             this.pageKey = pageKey;
             this.locale = locale;
         }
@@ -124,7 +123,7 @@ public class ContentfulCmsService implements CmsService {
         /**
          * Execute request to Contentful inside configured {@link Executor} context.
          */
-        CompletableFuture<Optional<CDAEntry>> fetch() {
+        private CompletableFuture<Optional<CDAEntry>> fetch() {
             ContentfulCallback contentfulCallback = new ContentfulCallback();
             callbackExecutor.execute(() ->
                     client.fetch(CDAEntry.class)
@@ -177,17 +176,17 @@ public class ContentfulCmsService implements CmsService {
                 }
             }
 
-            void completeExceptionally(final String message, final Throwable cause) {
+            private void completeExceptionally(final String message, final Throwable cause) {
                 future.completeExceptionally(new CmsServiceException(message, cause));
             }
 
-            boolean localeNotInSpace() {
+            private boolean localeNotInSpace() {
                 List<CDALocale> contentfulLocales = client.fetchSpace().locales();
                 return contentfulLocales.stream()
                         .noneMatch(cdaLocale -> Objects.equals(cdaLocale.code(), locale));
             }
 
-            CompletableFuture<Optional<CDAEntry>> toCompletableFuture() {
+            private CompletableFuture<Optional<CDAEntry>> toCompletableFuture() {
                 return future;
             }
         }
