@@ -8,7 +8,7 @@ defining unified API to fetch content from different CMS.
 
 * [Javadoc](https://commercetools.github.io/commercetools-sunrise-java-cms/javadoc/index.html)
 
-##Installation
+## Installation
 Choose the CMS adapter and follow its installation instructions:
 
 - [Contentful Sunrise Adapter](/cms-contentful)
