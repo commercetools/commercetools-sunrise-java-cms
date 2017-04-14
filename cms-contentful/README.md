@@ -71,7 +71,7 @@ Contentful space is expected to contain content created by reproducing following
 * add content entry for 'pageContent' type with the following value in 'description' field:
   "Fearless Abenteurer! Verteidiger von Pfannkuchen."
 * add content entry for 'page' type with the following values:
-  'slug': 'finn'; 'pageContent': reference to the 'pageContent' entry create in the previous step.
+  'slug': 'finn'; 'pageContent': reference to the 'pageContent' entry creates in the previous step.
 
 ## Error handling
 
