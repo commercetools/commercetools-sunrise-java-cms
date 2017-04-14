@@ -8,7 +8,7 @@ defining unified API to fetch content from different CMS.
 
 * [Javadoc](https://commercetools.github.io/commercetools-sunrise-java-cms/javadoc/index.html)
 
-##Installation
+## Installation
 Choose the CMS adapter and follow its installation instructions:
 
 - [Contentful Sunrise Adapter](/cms-contentful)
@@ -18,7 +18,7 @@ Note that if you are not using a Sunrise-based project, you'll additionally need
 libraryDependencies += "com.commercetools.sunrise.cms" % "cms-api" % "0.1.0"
 ```
 
-##Architecture
+## Architecture
 
 This API consists of five abstractions that reflect CMS hierarchical content structure:
 
@@ -49,7 +49,7 @@ Because of hierarchical structure of underlying content this identifier
 is expected to form "path like" syntax which resembles XPath and will be
 explained in the following sections.
 
-###Tree structure
+### Tree structure
 
 This section describes accessing a sample repository.
 
@@ -96,14 +96,14 @@ Empty result is returned for all of those paths.
 
 When service is requested to fetch page `entry2` the only correct paths are: `textField1` and `imageAssetField2` as there are no other fields or entries in this subtree.
 
-##Error handling
+## Error handling
 
 `CmsServiceException` is thrown in the following situations:
 
 - requested page is not unique - there are more than one results for given page identifier in repository
 - problems with data transfer - forbidden access, request badly formed etc.
 
-##Locale
+## Locale
 
 Underlying repository might provide localization of content. To leverage that this service can provide a page
 for the list of locales. The first locale on the list is matched against the repository content.

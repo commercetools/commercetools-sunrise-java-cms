@@ -6,7 +6,7 @@ Sunrise Java Contentful CMS
 Module for [Sunrise Java](https://github.com/sphereio/commercetools-sunrise-java)
 that serves as an adapter for Contentful CMS platform providing read access to its content.
 
-##Configuration
+## Configuration
 
 In order to create a new instance of `ContentfulCmsService` following parameters needs to be provided:
 
@@ -28,13 +28,13 @@ be executed.
 Contentful's JVM executor is synchronous and for that reason this service is built with additional `Executor`
 parameter to provide its user with control over execution context in which requests are executed.
 
-##Localization
+## Localization
 
 Contentful provides its users with localization facilities. Several locales might be defined for given space.
 This adapter might be used to request a page with empty locales list. In such situation implementation makes such
 request locale-independent. Contentful uses space's default locale in this case.
 
-##Supported field types
+## Supported field types
 
 Contentful provides several field types. This implementation serves following of them:
 
@@ -53,7 +53,7 @@ Fields of all other types are just converted by their `toString()` method.
 
 `Array` type is not representable as string. Fields of that type can only be used to access contained items.
 
-##Error handling
+## Error handling
 
 Content should be uniquely identified by chosen field. If there is more than one entity of chosen type with the same query field Contentful will return all of them but this service execution will result in `CompletableFuture` completed exceptionally by throwing `CmsServiceException` informing about non-unique identifier used.
 
