@@ -53,6 +53,26 @@ Fields of all other types are just converted by their `toString()` method.
 
 `Array` type is not representable as string. Fields of that type can only be used to access contained items.
 
+## Integration Tests
+
+In order to provide automatic verification of correct communication of ContentfulCmsService a single intgration test
+is implemented.
+
+In order for the test to pass CONTENTFUL_SPACE_ID and CONTENTFUL_TOKEN environment variables need to be set properly.
+
+Contentful space is expected to contain content created by reproducing following steps:
+
+* choose locale: de-DE
+* create content type with name 'page' and api ID 'page'
+* in 'page' type create new Text field with name 'slug' and field ID 'slug'
+* in 'page' type create new Reference field with name 'pageContent' and field ID 'pageContent'
+* create content type with name 'pageContent' and api ID 'pageContent'
+* in 'pageContent' type create new Text field with name 'description' and field ID 'description'
+* add content entry for 'pageContent' type with the following value in 'description' field:
+  "Fearless Abenteurer! Verteidiger von Pfannkuchen."
+* add content entry for 'page' type with the following values:
+  'slug': 'finn'; 'pageContent': reference to the 'pageContent' entry create in the previous step.
+
 ## Error handling
 
 Content should be uniquely identified by chosen field. If there is more than one entity of chosen type with the same query field Contentful will return all of them but this service execution will result in `CompletableFuture` completed exceptionally by throwing `CmsServiceException` informing about non-unique identifier used.
