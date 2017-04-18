@@ -11,7 +11,6 @@ import com.contentful.java.cda.CDALocale;
 import com.contentful.java.cda.CDAResource;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -19,6 +18,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executor;
+import java.util.function.Supplier;
 
 /**
  * Service providing access to CMS pages from Contentful platform.
@@ -91,7 +91,13 @@ public class ContentfulCmsService implements CmsService {
      */
     public static ContentfulCmsService of(final String spaceId, final String token, final String pageType,
                                           final String pageQueryField, final Executor callbackExecutor) {
-        return new ContentfulCmsService(createClient(spaceId, token), pageType, pageQueryField, callbackExecutor);
+        return of(() -> createClient(spaceId, token), pageType, pageQueryField, callbackExecutor);
+    }
+
+    static ContentfulCmsService of(final Supplier<CDAClient> contentfulClientProvider,
+                                   final String pageType, final String pageQueryField,
+                                   final Executor callbackExecutor) {
+        return new ContentfulCmsService(contentfulClientProvider.get(), pageType, pageQueryField, callbackExecutor);
     }
 
     private static CDAClient createClient(final String spaceId, final String token) {
@@ -105,11 +111,11 @@ public class ContentfulCmsService implements CmsService {
      * An Object handling all communication with Contentful platform based on given configuration in order to fetch
      * requested cms page for given locale.
      */
-    private class ContentCallback {
+    class ContentCallback {
         private final String pageKey;
         private final String locale;
 
-        ContentCallback(final String pageKey, final String locale) {
+        private ContentCallback(final String pageKey, final String locale) {
             this.pageKey = pageKey;
             this.locale = locale;
         }
@@ -117,7 +123,7 @@ public class ContentfulCmsService implements CmsService {
         /**
          * Execute request to Contentful inside configured {@link Executor} context.
          */
-        CompletableFuture<Optional<CDAEntry>> fetch() {
+        private CompletableFuture<Optional<CDAEntry>> fetch() {
             ContentfulCallback contentfulCallback = new ContentfulCallback();
             callbackExecutor.execute(() ->
                     client.fetch(CDAEntry.class)
@@ -136,7 +142,7 @@ public class ContentfulCmsService implements CmsService {
          * <p>
          * In case fetching failed a meaningful message is returned in {@link CmsServiceException}.
          */
-        private class ContentfulCallback extends CDACallback<CDAArray> {
+        class ContentfulCallback extends CDACallback<CDAArray> {
             private final CompletableFuture<Optional<CDAEntry>> future = new CompletableFuture<>();
 
             @Override
@@ -165,22 +171,22 @@ public class ContentfulCmsService implements CmsService {
                     } else {
                         completeExceptionally("Could not fetch content for " + pageKey, error);
                     }
-                } catch (IOException e) {
+                } catch (Throwable e) {
                     completeExceptionally("Could not fetch content for " + pageKey, error);
                 }
             }
 
-            void completeExceptionally(final String message, final Throwable cause) {
+            private void completeExceptionally(final String message, final Throwable cause) {
                 future.completeExceptionally(new CmsServiceException(message, cause));
             }
 
-            boolean localeNotInSpace() throws IOException {
+            private boolean localeNotInSpace() {
                 List<CDALocale> contentfulLocales = client.fetchSpace().locales();
                 return contentfulLocales.stream()
                         .noneMatch(cdaLocale -> Objects.equals(cdaLocale.code(), locale));
             }
 
-            CompletableFuture<Optional<CDAEntry>> toCompletableFuture() {
+            private CompletableFuture<Optional<CDAEntry>> toCompletableFuture() {
                 return future;
             }
         }
