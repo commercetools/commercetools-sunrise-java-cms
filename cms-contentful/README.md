@@ -55,7 +55,7 @@ Fields of all other types are just converted by their `toString()` method.
 
 ## Integration Tests
 
-In order to provide automatic verification of correct communication of ContentfulCmsService a single intgration test
+In order to provide automatic verification of correct communication of ContentfulCmsService a single integration test
 is implemented.
 
 In order for the test to pass CONTENTFUL_SPACE_ID and CONTENTFUL_TOKEN environment variables need to be set properly.
