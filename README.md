@@ -1,7 +1,7 @@
 Sunrise Java CMS :sunrise: :pencil2:
 ==================
 
-[![Build Status](https://travis-ci.org/commercetools/commercetools-sunrise-java-cms.png?branch=master)](https://travis-ci.org/commercetools/commercetools-sunrise-java-cms) [![Stories in Ready](https://badge.waffle.io/commercetools/commercetools-sunrise-java-cms.png?label=ready&title=Ready)](https://waffle.io/commercetools/commercetools-sunrise-java-cms)
+[![Build Status](https://travis-ci.org/commercetools/commercetools-sunrise-java-cms.svg?branch=master)](https://travis-ci.org/commercetools/commercetools-sunrise-java-cms) [![Stories in Ready](https://badge.waffle.io/commercetools/commercetools-sunrise-java-cms.png?label=ready&title=Ready)](https://waffle.io/commercetools/commercetools-sunrise-java-cms)
 
 Module for [Sunrise Java](https://github.com/sphereio/commercetools-sunrise-java)
 defining unified API to fetch content from different CMS.
