@@ -127,8 +127,8 @@ public class ContentfulCmsService implements CmsService {
             ContentfulCallback contentfulCallback = new ContentfulCallback();
             callbackExecutor.execute(() ->
                     client.fetch(CDAEntry.class)
-                            .where("content_type", pageType)
-                            .where("include", "10") // levels of entries to include in fetched hierarchy; 10 is Contentful's max
+                            .withContentType(pageType) // mandatory when filtering by fields in contentful
+                            .include(10) // levels of entries to include in fetched hierarchy; 10 is Contentful's max
                             .where("locale", locale)
                             .where(pageQueryField, pageKey)
                             .all(contentfulCallback)

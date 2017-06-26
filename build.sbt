@@ -34,7 +34,7 @@ lazy val `cms-contentful` = project
   .settings(
     libraryDependencies ++= Seq(
       // okhttp is used by contentful as optional dependency as HTTP client
-      "com.squareup.okhttp3" % "okhttp" % "3.2.0",
+      "com.squareup.okhttp3" % "okhttp" % "3.6.0",
       "com.contentful.java" % "java-sdk" % "7.6.2"
     )
   )
