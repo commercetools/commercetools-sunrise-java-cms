@@ -5,12 +5,14 @@ name := "commercetools-sunrise-cms"
 
 organization in ThisBuild := "com.commercetools.sunrise.cms"
 
+val jvmSdkVersion = "1.17.0"
+
 /**
  * PROJECT DEFINITIONS
  */
 
 lazy val `commercetools-sunrise-cms` = (project in file("."))
-  .aggregate(`cms-api`, `cms-contentful`)
+  .aggregate(`cms-api`, `cms-contentful`, `cms-ctp-custom-objects`)
   .settings(javaUnidocSettings ++ commonSettings : _*)
 
 lazy val `cms-api` = project
@@ -36,6 +38,17 @@ lazy val `cms-contentful` = project
       // okhttp is used by contentful as optional dependency as HTTP client
       "com.squareup.okhttp3" % "okhttp" % "3.6.0",
       "com.contentful.java" % "java-sdk" % "7.6.2"
+    )
+  )
+  .dependsOn(`cms-api`)
+
+lazy val `cms-ctp-custom-objects` = project
+  .configs(IntegrationTest)
+  .settings(commonSettings ++ commonTestSettings : _*)
+  .settings(
+     libraryDependencies ++= Seq (
+      "com.commercetools.sdk.jvm.core" % "commercetools-models" % jvmSdkVersion,
+      "com.commercetools.sdk.jvm.core" % "commercetools-java-client" % jvmSdkVersion
     )
   )
   .dependsOn(`cms-api`)

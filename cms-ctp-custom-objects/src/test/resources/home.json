@@ -1,0 +1,75 @@
+{
+  "id": "f4a98c47-1e4e-4007-bda6-9a7f0ba0fedd",
+  "version": 88,
+  "container": "co-cms-pages",
+  "key": "home",
+  "value": {
+    "content": {
+      "banners": [
+        {
+          "title": "Sommer Essentials",
+          "subtitle": "Die wichtigsten Stücke des Sommer Trends 2016",
+          "linkLabel": "Jetzt bestellen",
+          "link": "/de/men",
+          "backgroundImage": "/assets/img/cms/leather1-4to3.jpg"
+        },
+        {
+          "title": "cosplay",
+          "subtitle": "Beste Outfits für die Saison",
+          "linkLabel": "Jetzt bestellen",
+          "link": "/de/women",
+          "backgroundImage": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Halloween_Parade_2015_%2822256929336%29.jpg/2560px-Halloween_Parade_2015_%2822256929336%29.jpg"
+        },
+        {
+          "title": "Here comes the sun",
+          "subtitle": "FABULOUS EVERY DAY - SUMMER CHIC",
+          "description": "Die Modetrends für den Sommer 2016 spielen mit Prints, Army- und Safarilooks sowie Pastel Farben. Accessoires wie runde Sonnenbrillen, geschnürte Stiefel und Shopper oder Handtaschen sorgen für Abwechslung. SUNRISE stellt Ihnen die Fashion Trends für den Sommer 2016 vor. Lassen Sie sich inspirieren!<br/><br/>Kaum ist der Frühling vorbei, umfängt uns der warme Sommer. Erfahren Sie, was die wichtigsten Fashion - Trends der kommenden Sommersaison sind und welche traumhaften Stücke Sie besitzen sollen! London, New York, Mailand, Paris – SUNRISE präsentiert die aktuelle Sommermode 2016 aus den Modemetropolen . Die neuesten Kleider, elegante Tops, Hosen, Bademode, exklusive Schuhe und Ballerinas, bezaubernden Schmuck, Sonnenbrillen und Accessoires für den perfekten Sommer.",
+          "linkLabel": "Jetzt kaufen",
+          "link": "/de/men-clothing-shirts",
+          "backgroundImage": "/assets/img/cms/man1-8to3.jpg"
+        },
+        {
+          "title": "Einzigartige Stücke für jede Saison",
+          "subtitle": "Lassen Sie sich inspirieren",
+          "linkLabel": "Jetzt kaufen",
+          "link": "/de/women-shoes",
+          "backgroundImage": "/assets/img/cms/shoes-4to3.jpg"
+        },
+        {
+          "title": "SOMMER MODE 2016",
+          "backgroundImage": "/assets/img/cms/blue-bg-4to3.png"
+        },
+        {
+          "title": "Sonnenbrillen-Trends 2016",
+          "subtitle": "Unsere Fashion Must-Haves",
+          "linkLabel": "Jetzt kaufen",
+          "link": "/de/accessories-women-sunglasses",
+          "backgroundImage": "/assets/img/cms/sunglass-4to3.jpg"
+        },
+        {
+          "title": "Hauptsache überdimensional",
+          "subtitle": "Trendy Sommer 2016 - Auffällige Sonnenbrillen",
+          "linkLabel": "Jetzt bestellen",
+          "link": "/de/women-clothing-dresses",
+          "backgroundImage": "/assets/img/cms/woman-8to3.jpg"
+        }
+      ],
+      "suggestions": {
+        "title": "Unsere Empfehlungen",
+        "subtitle": "Sommer Must-Haves 2016"
+      },
+      "viewProducts": {
+        "linkText": "View all new products",
+        "linkHref": "new"
+      }
+    },
+    "dependencies": [
+      {
+        "typeId": "key-value-document",
+        "id": "5edf108a-e8d3-4d9d-9dde-cfe4a3036392"
+      }
+    ]
+  },
+  "createdAt": "2018-06-20T14:45:36.526Z",
+  "lastModifiedAt": "2018-06-22T13:10:26.197Z"
+}
