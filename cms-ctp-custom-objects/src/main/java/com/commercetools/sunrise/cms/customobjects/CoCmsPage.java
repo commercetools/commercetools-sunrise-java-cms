@@ -23,7 +23,6 @@ public class CoCmsPage implements CmsPage {
             }
         }
         this.objectNode = target;
-        System.err.println(SphereJsonUtils.prettyPrint(objectNode));
     }
 
     @Override
