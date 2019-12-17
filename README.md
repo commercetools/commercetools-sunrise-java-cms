@@ -10,6 +10,9 @@ defining unified API to fetch content from different CMS.
 
 * [Javadoc](https://commercetools.github.io/commercetools-sunrise-java-cms/javadoc/index.html)
 
+> :warning: **This repository is now deprecated and will be decommissioned in 2020.**
+If you would nevertheless like to use it for your own developments you should fork this repository under the given license and continue developing your version, but please be aware that there will be no more updates and no support provided.
+
 ## Installation
 Choose the CMS adapter and follow its installation instructions:
 
